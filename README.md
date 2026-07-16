@@ -4,6 +4,10 @@
 
 Fans and AI agents get live match data, an MCP tool surface, and pay‑per‑query intel gated by **real Injective x402 payments** — in one lightweight app.
 
+**Live demo:** deploy to Vercel in one click (see [Deploy](#deploy-to-vercel)). The deployed site runs live sports data **and** a working x402 (HTTP 402) API via serverless functions — no localhost required.
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/thesithunyein/striker-os)
+
 ---
 
 ## What it does / problem it solves
@@ -23,7 +27,7 @@ During a tournament, fans juggle scores and paid data feeds across tabs, and AI 
 
 | Tech | Real integration in this repo |
 |------|-------------------------------|
-| **x402** | `server/index.js` mounts the official [`@injectivelabs/x402`](https://injective.com/blog/x402) `injectivePaymentMiddleware` on `/api/match-intel-live` using **live Injective testnet USDC** (`eip155:1439`). Returns a real HTTP `402` with payment requirements; fund an x402 client to settle and unlock. A spec‑compliant demo route (`/api/match-intel`) runs the same handshake for the UI without funds. |
+| **x402** | `server/index.js` mounts the official [`@injectivelabs/x402`](https://injective.com/blog/x402) `injectivePaymentMiddleware` on `/api/match-intel-live` using **live Injective testnet USDC** (`eip155:1439`). Returns a real HTTP `402` with payment requirements; fund an x402 client to settle and unlock. The **deployed Vercel site** and a demo route (`/api/match-intel`) run the same spec‑compliant HTTP 402 → `X-PAYMENT` → unlock handshake so the flow is fully live in production without funds. |
 | **MCP Server** | `server/mcp-server.js` is a **real, runnable MCP server** (`@modelcontextprotocol/sdk`) exposing `worldcup_fixtures`, `worldcup_match`, `worldcup_teams`, backed by live data. Add it to Cursor/Claude via `mcp.json`. Pair with the official `@injectivelabs/mcp-server` (also in `mcp.json`) for on‑chain actions. |
 | **Agent Skills** | `skills/striker-worldcup/SKILL.md` is an installable Injective‑style skill that teaches an agent to read live fixtures and pay for intel via x402. Links to `injective-usdc-integration` and `injective-mcp-servers`. |
 | **USDC CCTP** | Documented burn → attestation → mint path into native Injective USDC to fund x402 spend, using the official Injective CCTP tools (`cctp_supported_chains`, `cctp_attestation_status`, `cctp_mint`). |
@@ -31,6 +35,30 @@ During a tournament, fans juggle scores and paid data feeds across tabs, and AI 
 ### Live World Cup data
 
 Match data is fetched live from [TheSportsDB](https://www.thesportsdb.com/). The free test key works out of the box; set `STRIKER_SPORTS_KEY` + `STRIKER_LEAGUE_ID` (or plug in football‑data.org) to point at the FIFA World Cup feed. The UI shows a **LIVE**/**DEMO** badge so it's always honest about the source.
+
+---
+
+## Deploy to Vercel
+
+The frontend is static and the API ships as **Vercel serverless functions** (`api/`), so the deployed site is fully functional on its own:
+
+```bash
+npm i -g vercel
+vercel            # preview
+vercel --prod     # production
+```
+
+Or import the repo at [vercel.com/new](https://vercel.com/new). Zero config — `vercel.json` handles routing.
+
+Deployed endpoints (same‑origin, auto‑used by the UI when not on localhost):
+
+```
+GET /api/health                       # status + x402 config
+GET /api/fixtures                     # live fixtures (TheSportsDB)
+GET /api/match-intel?match=spain      # 402 quote → resend with X-PAYMENT to unlock
+```
+
+Optional env vars in the Vercel dashboard: `STRIKER_SPORTS_KEY`, `STRIKER_LEAGUE_ID` (point at the World Cup feed), `X402_PRICE`, `X402_PAY_TO`, `X402_NETWORK`.
 
 ---
 
@@ -82,8 +110,14 @@ striker-os/
 ├── css/app.css                    # Theme
 ├── js/app.js                      # Wallet, x402 flow, live data, arena, oracle
 ├── data/worldcup-2026.js          # Offline fallback pack
+├── api/                           # Vercel serverless functions (deployed API)
+│   ├── health.js                  # status + x402 config
+│   ├── fixtures.js                # live fixtures
+│   └── match-intel.js             # spec-compliant x402 402 → unlock
+├── sports.cjs                     # Shared live sports data helper (serverless)
+├── vercel.json                    # Vercel routing/headers
 ├── server/
-│   ├── index.js                   # x402-protected API (real @injectivelabs/x402)
+│   ├── index.js                   # Local x402-protected API (real @injectivelabs/x402)
 │   ├── mcp-server.js              # Real MCP server (live World Cup tools)
 │   ├── worldcup.js                # Live sports data module
 │   └── package.json
@@ -135,7 +169,7 @@ Backend: see `.env.example` (`X402_NETWORK`, `X402_PRICE`, `X402_PAY_TO`, `X402_
 
 - **Live data:** real API calls (LIVE/DEMO badge shown).
 - **MCP server:** fully real and runnable — add it to your client and call the tools.
-- **x402:** real `@injectivelabs/x402` middleware mounted on `/api/match-intel-live` with live testnet USDC; it returns genuine 402 payment requirements. Settling a real payment needs a funded x402 client + facilitator. The UI uses the spec‑compliant demo route so the flow is visible without funds.
+- **x402:** real `@injectivelabs/x402` middleware mounted on `/api/match-intel-live` (local Express) with live testnet USDC; it returns genuine 402 payment requirements. Settling a real payment needs a funded x402 client + facilitator. The deployed Vercel site and the UI use the spec‑compliant 402 → `X-PAYMENT` → unlock handshake so the flow is fully visible in production without funds.
 - **CCTP:** documented, uses the official Injective CCTP tools; a mint needs funded keys.
 
 ---

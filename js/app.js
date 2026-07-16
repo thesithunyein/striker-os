@@ -7,10 +7,13 @@
   walletConnected: false
 };
 
+// On Vercel (or any real host) the API lives at same-origin /api serverless
+// functions. Locally we default to the Express server on :8787.
+const IS_LOCAL = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
 const API_ENDPOINT =
   window.STRIKER_API_ENDPOINT ||
   localStorage.getItem("striker_api_endpoint") ||
-  "http://localhost:8787";
+  (IS_LOCAL ? "http://localhost:8787" : "");
 const MCP_ENDPOINT = window.STRIKER_MCP_ENDPOINT || API_ENDPOINT;
 const GEMINI_KEY =
   window.STRIKER_GEMINI_KEY || localStorage.getItem("striker_gemini_key") || "";
