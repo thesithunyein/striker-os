@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Striker OS — World Cup intel on Injective</title>
+  <meta name="description" content="Striker OS: World Cup fan intel with Injective x402, CCTP, MCP Server, and Agent Skills." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Work+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/app.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="top rise">
+      <div class="brand">
+        <svg class="brand-mark" viewBox="0 0 16 16" shape-rendering="crispEdges" aria-hidden="true">
+          <rect x="0" y="0" width="16" height="16" fill="#151b42"/>
+          <rect x="4" y="2" width="8" height="1" fill="#f7d51d"/>
+          <rect x="3" y="3" width="10" height="1" fill="#f7d51d"/>
+          <rect x="2" y="4" width="12" height="8" fill="#f7d51d"/>
+          <rect x="3" y="12" width="10" height="1" fill="#f7d51d"/>
+          <rect x="4" y="13" width="8" height="1" fill="#f7d51d"/>
+          <rect x="6" y="6" width="2" height="2" fill="#151b42"/>
+          <rect x="9" y="6" width="2" height="2" fill="#151b42"/>
+          <rect x="5" y="9" width="6" height="1" fill="#151b42"/>
+          <rect x="4" y="8" width="1" height="1" fill="#151b42"/>
+          <rect x="11" y="8" width="1" height="1" fill="#151b42"/>
+        </svg>
+        <div>
+          <div class="eyebrow">Injective Global Cup</div>
+          <h1>STRIKER <span>OS</span></h1>
+          <p>World Cup fan intel · pay-per-query · agent-ready</p>
+        </div>
+      </div>
+
+      <div class="nav">
+        <a href="#tech">Tech</a>
+        <a href="#oracle">Oracle</a>
+        <a href="#arena">Goal Battle</a>
+        <a href="#fixtures">Fixtures</a>
+        <a href="README.md" target="_blank" rel="noopener">README</a>
+      </div>
+
+      <div class="wallet-bar">
+        <span class="chip chip-live"><span class="chip-dot"></span> injective-1</span>
+        <span class="balance" id="wallet-balance">25.00 USDC (demo)</span>
+        <button class="btn btn-primary" type="button" id="wallet-connect">Connect wallet</button>
+      </div>
+    </header>
+
+    <section class="hero rise rise-delay-1">
+      <div class="panel panel-pad">
+        <div class="eyebrow">Problem</div>
+        <h2>World Cup intel that agents can actually buy.</h2>
+        <p class="lead">
+          Fans and AI agents need knockout context without API-key sprawl.
+          Striker OS packages match boards, prediction skills, and Injective payment rails in one usable desk.
+        </p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#tech">Try Injective tech</a>
+          <a class="btn" href="#arena">Open Goal Battle</a>
+          <a class="btn btn-ghost" href="#fixtures">Live fixtures</a>
+        </div>
+        <div class="hero-meta">
+          <div class="pill">x402 pay-per-query</div>
+          <div class="pill">USDC CCTP bridging</div>
+          <div class="pill">MCP Server ready</div>
+          <div class="pill">Agent Skills packs</div>
+        </div>
+      </div>
+      <div class="panel panel-pad">
+        <div class="card-head">
+          <div>
+            <div class="eyebrow">Operator desk</div>
+            <h3>Matchday command</h3>
+          </div>
+          <div class="avatar-stack">
+            <img src="assets/avatar-ops.png" alt="Operator avatar" />
+            <img src="assets/avatar-pro.png" alt="Analyst avatar" />
+          </div>
+        </div>
+        <div class="mascot-row">
+          <img src="assets/mascot.png" alt="Striker OS mascot" />
+          <div>
+            <strong>Mascot guide</strong>
+            <span>Friendly intel cues, Codedex-style.</span>
+          </div>
+        </div>
+        <div class="stat-grid">
+          <div class="stat">
+            <div class="label">Operator</div>
+            <div class="value" id="operator-name" style="font-size:1rem">guest</div>
+          </div>
+          <div class="stat">
+            <div class="label">XP</div>
+            <div class="value" id="stat-xp">120</div>
+          </div>
+          <div class="stat">
+            <div class="label">Goals</div>
+            <div class="value" id="stat-goals">0</div>
+          </div>
+          <div class="stat">
+            <div class="label">USDC</div>
+            <div class="value" id="stat-usdc">$25.00</div>
+          </div>
+        </div>
+        <p style="margin:0.9rem 0 0;color:var(--muted);font-size:0.8rem;line-height:1.45">
+          MCP status: <strong id="mcp-status" style="color:var(--accent)">ACTIVE</strong>
+          · Accuracy boost: <strong id="stat-accuracy" style="color:var(--accent)">42%</strong>
+        </p>
+        <div class="mini-rail">
+          <div>
+            <span>Season pass</span>
+            <strong>Premium demo</strong>
+          </div>
+          <div>
+            <span>Oracle uptime</span>
+            <strong>99.8%</strong>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="tech" class="tech-strip rise rise-delay-2" aria-label="Injective technologies">
+      <button class="tech-card active" type="button" data-tech="x402">
+        <strong>x402</strong>
+        <span>Pay 0.01 USDC per match-intel request — HTTP 402 flow</span>
+      </button>
+      <button class="tech-card" type="button" data-tech="cctp">
+        <strong>CCTP</strong>
+        <span>Bridge native USDC into Injective to fund the agent</span>
+      </button>
+      <button class="tech-card" type="button" data-tech="mcp">
+        <strong>MCP Server</strong>
+        <span>Tool surface for balances, USDC info, CCTP status</span>
+      </button>
+      <button class="tech-card" type="button" data-tech="skills">
+        <strong>Agent Skills</strong>
+        <span>Reusable workflows: sentiment, odds, USDC, MCP setup</span>
+      </button>
+    </section>
+
+    <div class="layout rise rise-delay-3">
+      <div class="stack">
+        <section class="panel panel-pad">
+          <div class="section-head">
+            <div>
+              <h3>Injective technology desk</h3>
+              <p>Each tab maps to a real Injective building block. Demo buttons simulate the flow; README links production wiring.</p>
+            </div>
+          </div>
+
+          <div class="tech-demo active" data-demo="x402">
+            <div class="flow-steps">
+              <div class="flow-step"><span class="n">01</span><p>Client requests <code>/api/match-intel</code></p></div>
+              <div class="flow-step"><span class="n">02</span><p>Server returns <strong>HTTP 402</strong> with USDC quote (x402)</p></div>
+              <div class="flow-step"><span class="n">03</span><p>Wallet signs payment · facilitator settles on Injective (~650ms)</p></div>
+              <div class="flow-step"><span class="n">04</span><p>Retry with receipt · intel unlocked (no API key)</p></div>
+            </div>
+            <div class="row">
+              <button class="btn btn-primary" type="button" id="btn-x402">Pay x402 fee (0.01 USDC)</button>
+              <button class="btn" type="button" id="btn-x402-log">View receipt log</button>
+            </div>
+          </div>
+
+          <div class="tech-demo" data-demo="cctp">
+            <div class="flow-steps">
+              <div class="flow-step"><span class="n">01</span><p><code>cctp_supported_chains</code> — pick source chain</p></div>
+              <div class="flow-step"><span class="n">02</span><p>Burn USDC on source · wait Iris attestation</p></div>
+              <div class="flow-step"><span class="n">03</span><p><code>cctp_mint</code> on Injective EVM → native USDC</p></div>
+              <div class="flow-step"><span class="n">04</span><p>Fund x402 spend for World Cup queries</p></div>
+            </div>
+            <div class="row">
+              <button class="btn btn-warn" type="button" id="btn-cctp">Simulate CCTP +50 USDC</button>
+              <button class="btn" type="button" id="btn-cctp-log">View attestation log</button>
+            </div>
+          </div>
+
+          <div class="tech-demo" data-demo="mcp">
+            <div class="flow-steps">
+              <div class="flow-step"><span class="n">01</span><p>Run <a href="https://github.com/InjectiveLabs/mcp-server" target="_blank" rel="noopener" style="color:var(--accent)">InjectiveLabs/mcp-server</a></p></div>
+              <div class="flow-step"><span class="n">02</span><p>Connect from Cursor / Claude as an MCP client</p></div>
+              <div class="flow-step"><span class="n">03</span><p>Call USDC + CCTP tools beside this UI</p></div>
+            </div>
+            <div class="row">
+              <button class="btn" type="button" id="btn-mcp-ping">Ping MCP catalog</button>
+              <button class="btn" type="button" id="btn-mcp-usdc">usdc_native_info</button>
+            </div>
+          </div>
+
+          <div class="tech-demo" data-demo="skills">
+            <div class="skills" style="margin-top:0.4rem">
+              <button class="btn skill-btn" type="button" data-skill="sentiment">
+                <strong>Sentiment scraper</strong>
+                <span>Fan signal for Final-week matches</span>
+              </button>
+              <button class="btn skill-btn" type="button" data-skill="prediction">
+                <strong>Probability solver</strong>
+                <span>Knockout win bands + x402 boost</span>
+              </button>
+              <button class="btn skill-btn" type="button" data-skill="cctpSkill">
+                <strong>USDC / CCTP skill</strong>
+                <span>injective-usdc-integration checklist</span>
+              </button>
+              <button class="btn skill-btn" type="button" data-skill="mcpSkill">
+                <strong>MCP servers skill</strong>
+                <span>injective-mcp-servers install path</span>
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel panel-pad" id="oracle">
+          <div class="section-head">
+            <div>
+              <h3>Sports oracle</h3>
+              <p>Works offline with the built-in WC2026 demo pack. Optional Gemini key for live grounded search.</p>
+            </div>
+          </div>
+          <div class="query-row">
+            <input id="sports-query" type="text" placeholder="e.g. Who is in the World Cup 2026 Final?" />
+            <button class="btn btn-primary" type="button" id="btn-oracle">Run inquiry</button>
+          </div>
+          <div class="oracle-out" id="oracle-output">Waiting for a query. Try a fixture Analyze button or ask about Spain / Final.</div>
+        </section>
+
+        <section class="panel panel-pad" id="arena">
+          <div class="section-head">
+            <div>
+              <h3>Goal Battle arena</h3>
+              <p>Drag the ball back and release to shoot. x402 / skills raise accuracy boost.</p>
+            </div>
+          </div>
+          <div class="arena-wrap">
+            <canvas id="pitch"></canvas>
+            <div class="arena-hud">
+              <span>Drag ball to aim</span>
+              <span>Accuracy linked to intel boosts</span>
+            </div>
+          </div>
+          <div class="controls">
+            <div class="slider-block">
+              <label><span>Angle</span><span id="angle-val">0°</span></label>
+              <input id="strike-angle" type="range" min="-35" max="35" value="0" />
+              <label><span>Power</span><span id="power-val">65</span></label>
+              <input id="strike-power" type="range" min="30" max="100" value="65" />
+              <button class="btn btn-primary" type="button" id="btn-shoot" style="width:100%">Execute strike</button>
+            </div>
+            <div>
+              <p style="margin:0 0 0.65rem;color:var(--muted);font-size:0.8rem;line-height:1.45">
+                Use CCTP to fund USDC, x402 to unlock sharper intel (accuracy), then practice finishes here for demo clips.
+              </p>
+              <p style="margin:0;font-family:var(--font-mono);font-size:0.7rem;color:var(--muted)">
+                Tip for Goal Battle prize posts: record a full shoot demo after paying x402.
+              </p>
+              <div class="sprite-row">
+                <img src="assets/sprite-red.png" alt="Sprite 1" />
+                <img src="assets/sprite-green.png" alt="Sprite 2" />
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <aside class="stack">
+        <section class="panel panel-pad" id="fixtures">
+          <div class="section-head">
+            <div>
+              <h3>Live match board</h3>
+              <p>Real fixtures from a live sports API · configurable to the World Cup feed</p>
+            </div>
+            <span id="fixtures-source" class="chip"><span class="chip-dot"></span> LOADING</span>
+          </div>
+          <div id="fixture-list"></div>
+        </section>
+
+        <section class="panel panel-pad">
+          <div class="section-head">
+            <div>
+              <h3>System log</h3>
+              <p>x402 / CCTP / MCP traces</p>
+            </div>
+          </div>
+          <div class="console" id="live-console"></div>
+        </section>
+
+        <section class="panel panel-pad">
+          <div class="section-head">
+            <div>
+              <h3>Operator crew</h3>
+              <p>Injective-ready agents on deck</p>
+            </div>
+          </div>
+          <div class="crew">
+            <div>
+              <img src="assets/avatar-ops.png" alt="Ops avatar" />
+              <div>
+                <strong>Ops Captain</strong>
+                <span>Wallet + MCP monitor</span>
+              </div>
+            </div>
+            <div>
+              <img src="assets/avatar-pro.png" alt="Analyst avatar" />
+              <div>
+                <strong>Oracle Analyst</strong>
+                <span>Match intel synthesis</span>
+              </div>
+            </div>
+          </div>
+        </section>
+      </aside>
+    </div>
+
+    <footer>
+      <span>Striker OS · Injective Global Cup 2026</span>
+      <span>x402 · CCTP · MCP · Agent Skills</span>
+    </footer>
+  </div>
+
+  <script src="data/worldcup-2026.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

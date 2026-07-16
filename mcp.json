@@ -1,0 +1,19 @@
+{
+  "mcpServers": {
+    "striker-os-worldcup": {
+      "command": "node",
+      "args": ["server/mcp-server.js"],
+      "env": {
+        "STRIKER_SPORTS_KEY": "3",
+        "STRIKER_LEAGUE_ID": "4328"
+      }
+    },
+    "injective": {
+      "command": "npx",
+      "args": ["-y", "@injectivelabs/mcp-server"],
+      "env": {
+        "INJECTIVE_NETWORK": "testnet"
+      }
+    }
+  }
+}
