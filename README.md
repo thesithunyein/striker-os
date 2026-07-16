@@ -140,6 +140,10 @@ Backend: see `.env.example` (`X402_NETWORK`, `X402_PRICE`, `X402_PAY_TO`, `X402_
 
 ---
 
+## Author
+
+**Sithu Nyein** — [sithunyein.mailto@gmail.com](mailto:sithunyein.mailto@gmail.com)
+
 ## License
 
 MIT — built for the Injective Global Cup hackathon.
