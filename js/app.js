@@ -104,6 +104,8 @@ function addXp(amount) {
 }
 
 async function connectWallet() {
+  // Optional UX only — x402 / CCTP / MCP / skills work without a wallet.
+  // Keplr (Injective) if present; otherwise enter demo operator so judges can proceed.
   log("Initializing Injective wallet handshake...", "info");
   if (window.keplr) {
     try {
@@ -117,15 +119,22 @@ async function connectWallet() {
       ui.walletConnect.classList.add("btn-ghost");
       log(`Connected Keplr wallet ${state.operator}`, "success");
       addXp(20);
+      updateStats();
+      return;
     } catch (error) {
       log(`Wallet connection canceled: ${error.message}`, "warn");
     }
-  } else {
-    state.walletConnected = false;
-    state.operator = "demo_operator";
-    log("Keplr not detected. Using demo operator.", "warn");
   }
+  state.walletConnected = false;
+  state.operator = "demo_operator";
+  ui.walletConnect.textContent = "Demo mode (no Keplr)";
+  ui.walletConnect.classList.add("btn-ghost");
+  log(
+    "No Keplr wallet — demo mode ON. x402 / CCTP / MCP / Skills still work.",
+    "warn"
+  );
   updateStats();
+  addXp(5);
 }
 
 function toggleTech(tech) {
@@ -200,10 +209,13 @@ function simulateCctp() {
 }
 
 async function pingMcp() {
-  log("Pinging Striker OS API /health ...", "info");
-  try {
-    const response = await fetch(`${MCP_ENDPOINT}/health`);
-    if (response.ok) {
+  // Prefer same-origin /api/health (Vercel); fall back to Express /health locally.
+  const paths = [`${API_ENDPOINT}/api/health`, `${API_ENDPOINT}/health`];
+  log("Pinging Striker OS API ...", "info");
+  for (const url of paths) {
+    try {
+      const response = await fetch(url);
+      if (!response.ok) continue;
       const info = await response.json();
       ui.mcpStatus.textContent = "LIVE";
       log(
@@ -211,12 +223,15 @@ async function pingMcp() {
         "success"
       );
       return;
+    } catch (_) {
+      /* try next */
     }
-  } catch (error) {
-    log("Backend not reachable. Start it: cd server && npm start", "warn");
   }
   ui.mcpStatus.textContent = "OFFLINE";
-  log("MCP tools available via server/mcp-server.js (add to Cursor/Claude via mcp.json).", "info");
+  log(
+    "API offline. MCP tools still work via npm run mcp (server/mcp-server.js).",
+    "warn"
+  );
 }
 
 async function mcpUsdc() {
