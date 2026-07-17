@@ -31,37 +31,35 @@ window.WC2026 = {
       homeCode: "ENG",
       awayCode: "ARG",
       venue: "Atlanta Stadium",
-      score: null,
-      status: "Scheduled",
-      note: "Winner faces Spain in the Final"
+      score: "1–2",
+      status: "FT",
+      note: "Argentina advance (Fernandez 85, Martinez 90+2)"
     },
     {
       id: "b3",
       round: "Third-place",
       date: "2026-07-18",
       home: "France",
-      away: "Loser SF2 (ENG / ARG)",
+      away: "England",
       homeCode: "FRA",
-      awayCode: "SF2L",
-      awayFlags: ["ENG", "ARG"],
+      awayCode: "ENG",
       venue: "Miami Stadium",
       score: null,
       status: "Upcoming",
-      note: "Bronze final · loser of England vs Argentina"
+      note: "Bronze final"
     },
     {
       id: "final",
       round: "Final",
       date: "2026-07-19",
       home: "Spain",
-      away: "Winner SF2 (ENG / ARG)",
+      away: "Argentina",
       homeCode: "ESP",
-      awayCode: "SF2W",
-      awayFlags: ["ENG", "ARG"],
+      awayCode: "ARG",
       venue: "New York / New Jersey (MetLife area)",
       score: null,
       status: "Upcoming",
-      note: "World Cup Final · winner of England vs Argentina"
+      note: "World Cup Final · 19 July 2026"
     }
   ],
   knowledge: {
@@ -91,19 +89,19 @@ window.WC2026_FIXTURES = (window.WC2026.fixtures || []).map((f) => ({
 
 window.WC2026_KNOWLEDGE = [
   {
-    keywords: ["final", "champion", "winner", "spain"],
+    keywords: ["final", "champion", "winner", "spain", "argentina"],
     answer:
-      "WC2026 Final week: Spain are in the Final (beat France 2–0 in the SF). The other finalist is the winner of England vs Argentina. Kickoff 19 July 2026 · MetLife area (NY/NJ). Striker OS gates deeper win-probability reads behind x402."
+      "WC2026 Final: Spain vs Argentina · 19 July 2026 · MetLife area (NY/NJ). Spain beat France 2–0 in the SF; Argentina beat England 2–1 (late comeback). Striker OS gates deeper win-probability reads behind x402."
   },
   {
-    keywords: ["england", "argentina", "semi"],
+    keywords: ["england", "semi"],
     answer:
-      "Semi-final 2: England vs Argentina (15 July 2026, Atlanta). Winner meets Spain in the Final. Use Analyze → Pay x402 for a graded intel unlock."
+      "Semi-final 2 (15 July, Atlanta): England 1–2 Argentina. Gordon 55; Fernandez 85, Martinez 90+2. England play France in the third-place match (18 July, Miami)."
   },
   {
     keywords: ["france", "third", "bronze"],
     answer:
-      "France lost the SF to Spain (0–2) and may play the third-place match on 18 July in Miami against the loser of England/Argentina."
+      "Third-place: France vs England · 18 July 2026 · Miami. France lost the SF to Spain 0–2; England lost the SF to Argentina 1–2."
   },
   {
     keywords: ["inj", "injective", "x402"],
