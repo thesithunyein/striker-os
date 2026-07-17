@@ -848,6 +848,17 @@ header.top {
   display: block;
 }
 
+.flag-stack {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.flag-stack .team-flag {
+  width: 24px;
+  height: 18px;
+}
+
 .flag-fallback {
   display: inline-flex;
   align-items: center;

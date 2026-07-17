@@ -174,31 +174,52 @@
       .replace(/"/g, "&quot;");
   }
 
-  function flagImgHtml(team, label) {
-    const iso = resolveIso2(team);
-    const alt = escapeHtml(label || team || "Team");
+  function singleFlagImg(iso, alt) {
     if (!iso) {
-      return `<span class="flag-fallback" title="${alt}">TBD</span>`;
+      return `<span class="flag-fallback" title="${escapeHtml(alt)}">?</span>`;
     }
     const src = flagUrl(iso, 40);
     const srcset = flagSrcSet(iso);
     return (
       `<img class="team-flag" src="${src}"` +
       (srcset ? ` srcset="${srcset}"` : "") +
-      ` width="28" height="21" alt="${alt} flag" loading="lazy" decoding="async"` +
+      ` width="28" height="21" alt="${escapeHtml(alt)} flag" loading="lazy" decoding="async"` +
       ` onerror="this.onerror=null;this.src='${PLACEHOLDER_SVG}'" />`
     );
   }
 
-  function teamRowHtml(codeOrName, displayName) {
+  function flagImgHtml(team, label) {
+    const iso = resolveIso2(team);
+    return singleFlagImg(iso, label || team || "Team");
+  }
+
+  /** Dual flags for TBD knockout slots (e.g. Winner SF2 = ENG|ARG). */
+  function flagStackHtml(codes, label) {
+    const list = (codes || []).map((c) => resolveIso2(c)).filter(Boolean);
+    if (!list.length) {
+      return `<span class="flag-fallback" title="${escapeHtml(label || "TBD")}">TBD</span>`;
+    }
+    if (list.length === 1) return singleFlagImg(list[0], label);
+    return (
+      `<span class="flag-stack" title="${escapeHtml(label || "")}" aria-label="${escapeHtml(label || "TBD")}">` +
+      list.map((iso, i) => singleFlagImg(iso, (codes && codes[i]) || iso)).join("") +
+      `</span>`
+    );
+  }
+
+  function teamRowHtml(codeOrName, displayName, extraFlags) {
     const name = displayName || codeOrName || "TBD";
-    return `<div class="fixture-team">${flagImgHtml(codeOrName, name)}<span class="fixture-team-name">${escapeHtml(name)}</span></div>`;
+    const flags = Array.isArray(extraFlags) && extraFlags.length
+      ? flagStackHtml(extraFlags, name)
+      : flagImgHtml(codeOrName, name);
+    return `<div class="fixture-team">${flags}<span class="fixture-team-name">${escapeHtml(name)}</span></div>`;
   }
 
   window.StrikerFlags = {
     resolveIso2,
     flagUrl,
     flagImgHtml,
+    flagStackHtml,
     teamRowHtml,
     ISO_BY_FIFA,
     ISO_BY_NAME,

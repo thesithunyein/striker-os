@@ -40,26 +40,28 @@ window.WC2026 = {
       round: "Third-place",
       date: "2026-07-18",
       home: "France",
-      away: "Loser SF2",
+      away: "Loser SF2 (ENG / ARG)",
       homeCode: "FRA",
-      awayCode: "TBD",
+      awayCode: "SF2L",
+      awayFlags: ["ENG", "ARG"],
       venue: "Miami Stadium",
       score: null,
       status: "Upcoming",
-      note: "Bronze final"
+      note: "Bronze final · loser of England vs Argentina"
     },
     {
       id: "final",
       round: "Final",
       date: "2026-07-19",
       home: "Spain",
-      away: "Winner SF2",
+      away: "Winner SF2 (ENG / ARG)",
       homeCode: "ESP",
-      awayCode: "TBD",
+      awayCode: "SF2W",
+      awayFlags: ["ENG", "ARG"],
       venue: "New York / New Jersey (MetLife area)",
       score: null,
       status: "Upcoming",
-      note: "World Cup Final · 19 July 2026"
+      note: "World Cup Final · winner of England vs Argentina"
     }
   ],
   knowledge: {
@@ -82,7 +84,9 @@ window.WC2026_FIXTURES = (window.WC2026.fixtures || []).map((f) => ({
   home: f.home,
   away: f.away,
   homeCode: f.homeCode,
-  awayCode: f.awayCode
+  awayCode: f.awayCode,
+  homeFlags: f.homeFlags || null,
+  awayFlags: f.awayFlags || null
 }));
 
 window.WC2026_KNOWLEDGE = [

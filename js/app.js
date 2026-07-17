@@ -468,8 +468,12 @@ function paintFixtures(fixtures, mode) {
     const awayKey = fixture.awayCode || fixture.away;
     const homeLabel = fixture.home || homeKey;
     const awayLabel = fixture.away || awayKey;
-    const homeRow = Flags ? Flags.teamRowHtml(homeKey, homeLabel) : `<span>${homeLabel}</span>`;
-    const awayRow = Flags ? Flags.teamRowHtml(awayKey, awayLabel) : `<span>${awayLabel}</span>`;
+    const homeRow = Flags
+      ? Flags.teamRowHtml(homeKey, homeLabel, fixture.homeFlags)
+      : `<span>${homeLabel}</span>`;
+    const awayRow = Flags
+      ? Flags.teamRowHtml(awayKey, awayLabel, fixture.awayFlags)
+      : `<span>${awayLabel}</span>`;
     card.innerHTML = `
       <div class="fixture-main">
         <div class="fixture-teams">
