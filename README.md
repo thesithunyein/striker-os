@@ -23,6 +23,7 @@
   <img src="https://img.shields.io/badge/Injective-eip155%3A1439-00f2fe?style=flat-square&labelColor=151b42" alt="Injective" />
   <img src="https://img.shields.io/badge/WC2026-Knockout%20Board-e76e55?style=flat-square&labelColor=151b42" alt="WC2026" />
   <img src="https://img.shields.io/badge/Deploy-Vercel-000000?style=flat-square&logo=vercel&logoColor=white" alt="Vercel" />
+  <img src="https://img.shields.io/badge/Flags-flagcdn%20PNG-00C853?style=flat-square&labelColor=151b42" alt="Flags" />
 </p>
 
 <p align="center">
@@ -139,7 +140,7 @@ During a tournament, fans juggle scores and paid data feeds across tabs, and AI 
 
 ### World Cup data
 
-Primary board = **FIFA World Cup 2026 knockout pack** (`data/worldcup-2026.js`) for Final-week context and screenshots. Toggle **Live soccer API** (TheSportsDB) beside it. MCP tools (`worldcup_fixtures`, etc.) use the live sports module. Badge shows **WC2026** or **LIVE API**.
+Primary board = **FIFA World Cup 2026 knockout pack** (`data/worldcup-2026.js`) for Final-week context and screenshots. Each fixture shows **real country flags** (PNG via [flagcdn.com](https://flagcdn.com) — works in all major browsers). Toggle **Live soccer API** (TheSportsDB) beside it. MCP tools (`worldcup_fixtures`, etc.) use the live sports module. Badge shows **WC2026** or **LIVE API**.
 
 ---
 

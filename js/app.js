@@ -33,6 +33,10 @@ function normalizeEvent(ev) {
   const played = hs !== null && hs !== undefined && hs !== "";
   return {
     match: `${home} vs ${away}`,
+    home,
+    away,
+    homeCode: home.slice(0, 3).toUpperCase(),
+    awayCode: away.slice(0, 3).toUpperCase(),
     stage: ev.strLeague || "Soccer",
     date: ev.dateEvent || "TBD",
     score: played ? `${hs} - ${as}` : "Upcoming",
@@ -455,13 +459,24 @@ async function runOracle() {
 }
 
 function paintFixtures(fixtures, mode) {
+  const Flags = window.StrikerFlags;
   ui.fixtureList.innerHTML = "";
   fixtures.forEach((fixture) => {
     const card = document.createElement("div");
     card.className = "fixture-card";
+    const homeKey = fixture.homeCode || fixture.home;
+    const awayKey = fixture.awayCode || fixture.away;
+    const homeLabel = fixture.home || homeKey;
+    const awayLabel = fixture.away || awayKey;
+    const homeRow = Flags ? Flags.teamRowHtml(homeKey, homeLabel) : `<span>${homeLabel}</span>`;
+    const awayRow = Flags ? Flags.teamRowHtml(awayKey, awayLabel) : `<span>${awayLabel}</span>`;
     card.innerHTML = `
-      <div>
-        <div class="fixture-title">${fixture.match}</div>
+      <div class="fixture-main">
+        <div class="fixture-teams">
+          ${homeRow}
+          <span class="fixture-vs">vs</span>
+          ${awayRow}
+        </div>
         <div class="fixture-meta">${fixture.stage} · ${fixture.date} · ${
       fixture.score || "Upcoming"
     }</div>
@@ -484,6 +499,16 @@ function paintFixtures(fixtures, mode) {
       badge.className = "chip chip-live";
     }
   }
+}
+
+function renderHostsRow() {
+  const el = document.getElementById("hosts-row");
+  const Flags = window.StrikerFlags;
+  if (!el || !Flags) return;
+  el.innerHTML = Flags.WC_HOSTS.map(
+    (h) =>
+      `<span class="host-pill">${Flags.flagImgHtml(h.name, h.name)}<span>${h.name}</span></span>`
+  ).join("");
 }
 
 async function showWcBoard() {
@@ -755,6 +780,7 @@ if (ui.x402Curl) {
 }
 
 renderFixtures();
+renderHostsRow();
 updateStats();
 log("Striker OS ready · WC2026 board + x402 API on this host.", "success");
 // Auto-ping health so judges see LIVE without hunting.

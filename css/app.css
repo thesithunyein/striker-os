@@ -786,6 +786,30 @@ header.top {
   gap: 0.55rem;
 }
 
+.hosts-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin: 0 0 0.65rem;
+}
+
+.host-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.5rem;
+  border: 2px solid var(--line);
+  background: var(--bg-2);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--muted);
+}
+
+.host-pill .team-flag {
+  width: 22px;
+  height: 16px;
+}
+
 .fixture-card {
   padding: 0.75rem 0.8rem;
   border: 2px solid var(--line);
@@ -794,6 +818,62 @@ header.top {
   justify-content: space-between;
   align-items: center;
   gap: 0.65rem;
+}
+
+.fixture-main {
+  min-width: 0;
+  flex: 1;
+}
+
+.fixture-teams {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.5rem;
+}
+
+.fixture-team {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.team-flag {
+  width: 28px;
+  height: 21px;
+  object-fit: cover;
+  border: 1px solid var(--line-strong);
+  background: var(--panel);
+  flex-shrink: 0;
+  display: block;
+}
+
+.flag-fallback {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 21px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  font-family: var(--font-mono);
+  font-size: 0.5rem;
+  color: var(--muted);
+}
+
+.fixture-team-name {
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+
+.fixture-vs {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--muted);
+  padding: 0 0.15rem;
 }
 
 .fixture-title {
@@ -808,7 +888,7 @@ header.top {
   font-family: var(--font-mono);
   font-size: 0.7rem;
   color: var(--muted);
-  margin-top: 0.3rem;
+  margin-top: 0.35rem;
 }
 
 .fixture-card .btn {

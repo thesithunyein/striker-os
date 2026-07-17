@@ -80,7 +80,9 @@ window.WC2026_FIXTURES = (window.WC2026.fixtures || []).map((f) => ({
   venue: f.venue,
   note: f.note,
   home: f.home,
-  away: f.away
+  away: f.away,
+  homeCode: f.homeCode,
+  awayCode: f.awayCode
 }));
 
 window.WC2026_KNOWLEDGE = [
