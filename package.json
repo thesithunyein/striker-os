@@ -1,0 +1,9 @@
+{
+  "name": "striker-os",
+  "private": true,
+  "description": "World Cup intel desk — x402, CCTP, MCP, Agent Skills (Injective Global Cup)",
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "check": "node --check lib/striker-model.js && node --check api/match-intel.js && node --check js/app.js"
+  }
+}

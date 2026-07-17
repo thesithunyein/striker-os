@@ -186,7 +186,15 @@ Optional env vars in the Vercel dashboard: `STRIKER_SPORTS_KEY`, `STRIKER_LEAGUE
 
 ---
 
-## Quick start
+## Tests
+
+Zero-dep Node built-in runner — covers the Striker Model math and the x402 handshake (402 → unlock → replay 409):
+
+```bash
+npm test
+```
+
+### Quick start
 
 ### 1. Frontend (no build step)
 
