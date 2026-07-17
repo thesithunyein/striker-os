@@ -257,6 +257,7 @@ header.top {
   height: 40px;
   flex-shrink: 0;
   image-rendering: pixelated;
+  display: block;
 }
 
 .brand h1 {
