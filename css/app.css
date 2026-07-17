@@ -703,6 +703,25 @@ header.top {
   border: 3px solid var(--line-strong);
   background: #0b1030;
   box-shadow: var(--shadow-sm);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.arena-wrap.arena-goal-burst {
+  border-color: var(--gold);
+  box-shadow: 0 0 28px rgba(247, 213, 29, 0.55), var(--shadow-sm);
+  animation: arena-goal-pulse 0.55s ease;
+}
+
+@keyframes arena-goal-pulse {
+  0% {
+    filter: brightness(1);
+  }
+  40% {
+    filter: brightness(1.4);
+  }
+  100% {
+    filter: brightness(1);
+  }
 }
 
 #pitch {
@@ -711,6 +730,10 @@ header.top {
   display: block;
   cursor: crosshair;
   image-rendering: pixelated;
+}
+
+#pitch.arena-locked {
+  cursor: not-allowed;
 }
 
 .arena-hud {
@@ -758,6 +781,18 @@ header.top {
 
 .slider-block .btn {
   width: 100%;
+}
+
+.slider-block .btn:disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: var(--shadow-sm);
+}
+
+.slider-block input[type="range"]:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .arena-tip p {

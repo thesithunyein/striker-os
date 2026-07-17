@@ -542,13 +542,32 @@ async function renderFixtures() {
 const arena = (() => {
   const canvas = document.getElementById("pitch");
   const ctx = canvas.getContext("2d");
+  const arenaWrap = document.getElementById("arena-wrap");
+  const arenaHint = document.getElementById("arena-hint");
+  const shootBtn = document.getElementById("btn-shoot");
   const ballStart = { x: 80, y: 130 };
   let ball = { x: ballStart.x, y: ballStart.y, vx: 0, vy: 0, r: 8, fired: false };
   let goalie = { x: 0, y: 120, dir: 1, speed: 1.8, w: 12, h: 36 };
   let dragging = false;
   let dragPoint = { x: 0, y: 0 };
   let message = "";
-  let messageColor = "#2ee6a8";
+  let messageColor = "#92cc41";
+  let locked = false;
+  let resolved = false;
+  let flightMs = 0;
+  let particles = [];
+  let flash = 0;
+
+  function setLocked(on) {
+    locked = on;
+    if (shootBtn) shootBtn.disabled = on;
+    if (ui.strikeAngle) ui.strikeAngle.disabled = on;
+    if (ui.strikePower) ui.strikePower.disabled = on;
+    canvas.classList.toggle("arena-locked", on);
+    if (arenaHint) {
+      arenaHint.textContent = on ? "Shot in play…" : "Drag to aim";
+    }
+  }
 
   function resize() {
     const rect = canvas.getBoundingClientRect();
@@ -565,11 +584,79 @@ const arena = (() => {
   function reset() {
     ball = { x: ballStart.x, y: ballStart.y, vx: 0, vy: 0, r: 8, fired: false };
     message = "";
+    resolved = false;
+    flightMs = 0;
+    particles = [];
+    flash = 0;
+    dragging = false;
+    setLocked(false);
+  }
+
+  function spawnConfetti(x, y) {
+    const colors = ["#f7d51d", "#92cc41", "#209cee", "#ffffff", "#e76e55"];
+    for (let i = 0; i < 48; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = 2 + Math.random() * 5;
+      particles.push({
+        x,
+        y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed - 2,
+        life: 50 + Math.random() * 30,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        size: 2 + Math.random() * 3
+      });
+    }
+  }
+
+  function resolveShot(type) {
+    if (resolved) return;
+    resolved = true;
+    ball.vx = 0;
+    ball.vy = 0;
+    setLocked(true);
+
+    if (type === "goal") {
+      message = "GOAL!";
+      messageColor = "#92cc41";
+      flash = 1;
+      spawnConfetti(ball.x, ball.y);
+      if (arenaWrap) {
+        arenaWrap.classList.add("arena-goal-burst");
+        setTimeout(() => arenaWrap.classList.remove("arena-goal-burst"), 700);
+      }
+      state.goals += 1;
+      localStorage.setItem("striker_goals", String(state.goals));
+      addXp(10);
+      updateStats();
+      log("Goal Battle: GOAL! Record this clip for social posts.", "success");
+      setTimeout(reset, 2000);
+      return;
+    }
+
+    if (type === "blocked") {
+      message = "BLOCKED";
+      messageColor = "#e76e55";
+      log("Goal Battle: blocked by keeper.", "warn");
+      setTimeout(reset, 1400);
+      return;
+    }
+
+    message = "MISS";
+    messageColor = "#9aa6d6";
+    log("Goal Battle: miss — reset and try again.", "info");
+    setTimeout(reset, 1400);
   }
 
   function drawPitch() {
     ctx.fillStyle = "#0b1030";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+    if (flash > 0) {
+      ctx.fillStyle = `rgba(247, 213, 29, ${flash * 0.22})`;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      flash *= 0.88;
+      if (flash < 0.02) flash = 0;
+    }
     ctx.strokeStyle = "rgba(146, 204, 65, 0.35)";
     ctx.lineWidth = 2;
     ctx.strokeRect(6, 6, canvas.width - 12, canvas.height - 12);
@@ -579,28 +666,44 @@ const arena = (() => {
     ctx.stroke();
   }
 
-  function updateBall() {
-    if (!ball.fired) return;
+  function updateParticles() {
+    particles = particles.filter((p) => {
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy += 0.12;
+      p.life -= 1;
+      return p.life > 0;
+    });
+  }
+
+  function drawParticles() {
+    particles.forEach((p) => {
+      ctx.fillStyle = p.color;
+      ctx.fillRect(p.x, p.y, p.size, p.size);
+    });
+  }
+
+  function updateBall(dt) {
+    if (!ball.fired || resolved) return;
+    flightMs += dt;
     ball.x += ball.vx;
     ball.y += ball.vy;
     ball.vx *= 0.985;
     ball.vy *= 0.985;
 
     if (ball.y - ball.r < 6 || ball.y + ball.r > canvas.height - 6) {
-      ball.vy *= -1;
+      ball.vy *= -0.85;
     }
     if (ball.x - ball.r < 6) {
-      ball.vx *= -1;
+      ball.vx *= -0.85;
     }
 
     const gTop = goalie.y - goalie.h / 2;
     const gBottom = goalie.y + goalie.h / 2;
     if (ball.x + ball.r >= goalie.x && ball.x - ball.r <= goalie.x + goalie.w) {
       if (ball.y >= gTop && ball.y <= gBottom) {
-        ball.vx = -Math.abs(ball.vx) * 1.2 - 1.2;
-        message = "BLOCKED";
-        messageColor = "#e76e55";
-        setTimeout(reset, 1200);
+        resolveShot("blocked");
+        return;
       }
     }
 
@@ -608,18 +711,31 @@ const arena = (() => {
     const goalBottom = canvas.height / 2 + 35;
     if (ball.x + ball.r >= canvas.width - 14) {
       if (ball.y >= goalTop && ball.y <= goalBottom) {
-        ball.vx = 0;
-        ball.vy = 0;
-        message = "GOAL!";
-        messageColor = "#92cc41";
-        state.goals += 1;
-        localStorage.setItem("striker_goals", String(state.goals));
-        addXp(10);
-        updateStats();
-        setTimeout(reset, 1200);
+        const gTop2 = goalie.y - goalie.h / 2;
+        const gBottom2 = goalie.y + goalie.h / 2;
+        const blockedByKeeper =
+          ball.x + ball.r >= goalie.x &&
+          ball.y >= gTop2 &&
+          ball.y <= gBottom2;
+        if (!blockedByKeeper) {
+          resolveShot("goal");
+        } else {
+          resolveShot("blocked");
+        }
       } else {
-        ball.vx *= -0.8;
+        ball.vx *= -0.75;
+        ball.x = Math.min(ball.x, canvas.width - 20);
       }
+      return;
+    }
+
+    const speed = Math.hypot(ball.vx, ball.vy);
+    if (speed < 0.35 && ball.x > canvas.width * 0.45) {
+      resolveShot("miss");
+      return;
+    }
+    if (flightMs > 4500) {
+      resolveShot("miss");
     }
   }
 
@@ -634,7 +750,7 @@ const arena = (() => {
   }
 
   function drawGoalie() {
-    if (!message) {
+    if (!resolved) {
       goalie.y += goalie.speed * goalie.dir;
       if (goalie.y < canvas.height / 2 - 45 || goalie.y > canvas.height / 2 + 45) {
         goalie.dir *= -1;
@@ -646,16 +762,21 @@ const arena = (() => {
 
   function drawMessage() {
     if (!message) return;
-    ctx.fillStyle = "rgba(0,0,0,0.6)";
-    ctx.fillRect(0, canvas.height / 2 - 24, canvas.width, 48);
+    ctx.fillStyle = "rgba(0,0,0,0.65)";
+    ctx.fillRect(0, canvas.height / 2 - 28, canvas.width, 56);
     ctx.fillStyle = messageColor;
-    ctx.font = "12px 'Press Start 2P', monospace";
+    ctx.font = "14px 'Press Start 2P', monospace";
     ctx.textAlign = "center";
     ctx.fillText(message, canvas.width / 2, canvas.height / 2 + 6);
+    if (message === "GOAL!") {
+      ctx.font = "8px 'Press Start 2P', monospace";
+      ctx.fillStyle = "#f7d51d";
+      ctx.fillText("NICE!", canvas.width / 2, canvas.height / 2 + 22);
+    }
   }
 
   function drawDrag() {
-    if (!dragging) return;
+    if (!dragging || locked) return;
     ctx.strokeStyle = "#7ae3ff";
     ctx.lineWidth = 3;
     ctx.beginPath();
@@ -664,23 +785,31 @@ const arena = (() => {
     ctx.stroke();
   }
 
-  function loop() {
+  let lastTs = 0;
+  function loop(ts) {
+    const dt = lastTs ? Math.min(32, ts - lastTs) : 16;
+    lastTs = ts;
     drawPitch();
     drawGoalie();
-    updateBall();
+    updateBall(dt);
+    updateParticles();
     drawBall();
+    drawParticles();
     drawDrag();
     drawMessage();
     requestAnimationFrame(loop);
   }
 
   function kick(power, angle) {
-    if (ball.fired) return;
+    if (locked || ball.fired) return;
     const rad = (angle * Math.PI) / 180;
     ball.vx = (power / 8) * Math.cos(rad);
     ball.vy = (power / 8) * Math.sin(rad);
     ball.fired = true;
+    resolved = false;
+    flightMs = 0;
     message = "";
+    setLocked(true);
     log(`Kick fired (${power} power, ${angle}°).`, "info");
   }
 
@@ -694,22 +823,17 @@ const arena = (() => {
     };
   }
 
-  canvas.addEventListener("mousedown", (event) => {
-    const pos = getPos(event);
+  function tryDragStart(pos) {
+    if (locked || ball.fired) return;
     const dist = Math.hypot(pos.x - ball.x, pos.y - ball.y);
-    if (dist < 20 && !ball.fired) {
+    if (dist < 24) {
       dragging = true;
       dragPoint = pos;
     }
-  });
+  }
 
-  canvas.addEventListener("mousemove", (event) => {
-    if (!dragging) return;
-    dragPoint = getPos(event);
-  });
-
-  window.addEventListener("mouseup", () => {
-    if (!dragging) return;
+  function releaseDrag() {
+    if (!dragging || locked) return;
     dragging = false;
     const dx = ball.x - dragPoint.x;
     const dy = ball.y - dragPoint.y;
@@ -723,12 +847,47 @@ const arena = (() => {
       ui.powerVal.textContent = `${ui.strikePower.value}`;
       kick(power, ui.strikeAngle.value);
     }
+  }
+
+  canvas.addEventListener("mousedown", (event) => {
+    tryDragStart(getPos(event));
+  });
+
+  canvas.addEventListener("mousemove", (event) => {
+    if (!dragging) return;
+    dragPoint = getPos(event);
+  });
+
+  canvas.addEventListener("mouseup", releaseDrag);
+
+  canvas.addEventListener(
+    "touchstart",
+    (event) => {
+      event.preventDefault();
+      tryDragStart(getPos(event));
+    },
+    { passive: false }
+  );
+
+  canvas.addEventListener(
+    "touchmove",
+    (event) => {
+      if (!dragging) return;
+      event.preventDefault();
+      dragPoint = getPos(event);
+    },
+    { passive: false }
+  );
+
+  canvas.addEventListener("touchend", (event) => {
+    event.preventDefault();
+    releaseDrag();
   });
 
   window.addEventListener("resize", resize);
 
   resize();
-  loop();
+  requestAnimationFrame(loop);
 
   return { kick };
 })();
