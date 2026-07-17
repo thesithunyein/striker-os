@@ -44,36 +44,36 @@ Fans and AI agents get a **WC2026 match board**, an MCP tool surface, and pay‑
 
 ## Architecture
 
-End‑to‑end flow judges can click on production — no localhost required.
+End-to-end flow judges can click on production — no localhost required.
 
 ```mermaid
 flowchart TB
-  subgraph Client["🖥️ Striker OS UI · Codedex quest desk"]
+  subgraph Client["Striker OS UI"]
     Board["WC2026 Match Board"]
     Oracle["Sports Oracle"]
     Arena["Goal Battle"]
-    Desk["Tech Desk · x402 / CCTP / MCP / Skills"]
+    Desk["Tech Desk x402 CCTP MCP Skills"]
   end
 
-  subgraph Edge["☁️ Vercel · same-origin /api"]
+  subgraph Edge["Vercel same-origin API"]
     Health["GET /api/health"]
     Fixtures["GET /api/fixtures"]
     Intel["GET /api/match-intel"]
   end
 
-  subgraph Pay["⚡ Injective x402"]
-    Q402["HTTP 402 + USDC quote\neip155:1439"]
-    Unlock["X-PAYMENT → intel unlock"]
-    LiveMW["@injectivelabs/x402\n/api/match-intel-live"]
+  subgraph Pay["Injective x402"]
+    Q402["HTTP 402 USDC quote"]
+    Unlock["X-PAYMENT then unlock"]
+    LiveMW["injectivelabs x402 live route"]
   end
 
-  subgraph Agents["🤖 Agent layer"]
-    MCP["MCP Server\nworldcup_fixtures\nworldcup_match\nworldcup_teams"]
-    Skill["Agent Skill\nskills/striker-worldcup"]
-    CCTP["USDC CCTP path\nburn → attest → mint"]
+  subgraph Agents["Agent layer"]
+    MCP["MCP Server worldcup tools"]
+    Skill["Agent Skill striker-worldcup"]
+    CCTP["USDC CCTP burn attest mint"]
   end
 
-  subgraph Data["📊 World Cup data"]
+  subgraph Data["World Cup data"]
     Pack["WC2026 knockout pack"]
     Sports["TheSportsDB live API"]
   end
@@ -91,27 +91,27 @@ flowchart TB
   Skill --> MCP
   Skill --> Intel
   CCTP -->|fund USDC| Desk
-  LiveMW -.->|local Express + testnet| Q402
-  Arena -->|accuracy ↔ paid intel| Desk
+  LiveMW -.->|local Express testnet| Q402
+  Arena -->|accuracy boost| Desk
 ```
 
 ### x402 payment path (production)
 
 ```mermaid
 sequenceDiagram
-  participant U as Operator / Agent
+  participant U as Operator
   participant UI as Striker OS
-  participant API as /api/match-intel
-  participant INJ as Injective · eip155:1439
+  participant API as match-intel API
+  participant INJ as Injective
 
   U->>UI: Pay 0.01 USDC / Prove 402
-  UI->>API: GET ?match=spain
-  API-->>UI: HTTP 402 + accepts[] quote
-  Note over UI: Quote shown live in proof panel
-  UI->>API: GET + header X-PAYMENT
-  API-->>UI: 200 + match intel
-  UI-->>U: Intel unlocked · accuracy boost
-  Note over INJ: Live middleware also on<br/>/api/match-intel-live (Express)
+  UI->>API: GET match=spain
+  API-->>UI: HTTP 402 quote
+  Note over UI: Quote shown in proof panel
+  UI->>API: GET with X-PAYMENT header
+  API-->>UI: 200 match intel
+  UI-->>U: Intel unlocked
+  Note over INJ: Live middleware on match-intel-live
 ```
 
 ---
