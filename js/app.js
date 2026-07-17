@@ -547,7 +547,9 @@ const arena = (() => {
   const shootBtn = document.getElementById("btn-shoot");
   const ballStart = { x: 80, y: 130 };
   let ball = { x: ballStart.x, y: ballStart.y, vx: 0, vy: 0, r: 8, fired: false };
-  let goalie = { x: 0, y: 120, dir: 1, speed: 1.8, w: 12, h: 36 };
+  // Collision box for keeper (sprite drawn larger around this).
+  let goalie = { x: 0, y: 120, dir: 1, speed: 1.8, w: 14, h: 40 };
+  let keeperDive = 0;
   let dragging = false;
   let dragPoint = { x: 0, y: 0 };
   let message = "";
@@ -588,6 +590,7 @@ const arena = (() => {
     flightMs = 0;
     particles = [];
     flash = 0;
+    keeperDive = 0;
     dragging = false;
     setLocked(false);
   }
@@ -637,6 +640,7 @@ const arena = (() => {
     if (type === "blocked") {
       message = "BLOCKED";
       messageColor = "#e76e55";
+      keeperDive = 18;
       log("Goal Battle: blocked by keeper.", "warn");
       setTimeout(reset, 1400);
       return;
@@ -739,6 +743,77 @@ const arena = (() => {
     }
   }
 
+  function px(x, y, w, h, color) {
+    ctx.fillStyle = color;
+    ctx.fillRect(Math.round(x), Math.round(y), w, h);
+  }
+
+  /** Pixel striker (brand smiley) standing behind the ball when idle. */
+  function drawShooter() {
+    if (ball.fired && !resolved) return;
+    const sx = ball.x - 28;
+    const sy = ball.y - 6;
+    // Body
+    px(sx + 4, sy + 10, 10, 12, "#209cee");
+    // Legs
+    px(sx + 4, sy + 22, 3, 8, "#151b42");
+    px(sx + 11, sy + 22, 3, 8, "#151b42");
+    // Arms
+    px(sx + 1, sy + 12, 3, 8, "#f0c8a0");
+    px(sx + 14, sy + 12, 3, 8, "#f0c8a0");
+    // Head — Striker OS gold logo face
+    px(sx + 3, sy, 12, 11, "#f7d51d");
+    px(sx + 5, sy + 3, 2, 2, "#151b42");
+    px(sx + 10, sy + 3, 2, 2, "#151b42");
+    px(sx + 5, sy + 7, 6, 1, "#151b42");
+    px(sx + 4, sy + 6, 1, 1, "#151b42");
+    px(sx + 11, sy + 6, 1, 1, "#151b42");
+  }
+
+  /** Pixel goalkeeper person (gloves + jersey), not a red bar. */
+  function drawGoalie() {
+    if (!resolved) {
+      goalie.y += goalie.speed * goalie.dir;
+      if (goalie.y < canvas.height / 2 - 45 || goalie.y > canvas.height / 2 + 45) {
+        goalie.dir *= -1;
+      }
+    }
+    if (keeperDive > 0) keeperDive -= 1;
+
+    const cx = goalie.x + goalie.w / 2;
+    const cy = goalie.y;
+    const dive = keeperDive > 0 ? -4 : 0;
+
+    // Shadow
+    px(cx - 8, cy + 22, 16, 3, "rgba(0,0,0,0.35)");
+
+    // Legs
+    px(cx - 6, cy + 10, 4, 12, "#1b2350");
+    px(cx + 2, cy + 10, 4, 12, "#1b2350");
+    // Boots
+    px(cx - 7, cy + 20, 5, 3, "#0a0e27");
+    px(cx + 2, cy + 20, 5, 3, "#0a0e27");
+
+    // Torso (keeper jersey — red)
+    px(cx - 7, cy - 6, 14, 16, "#e76e55");
+    px(cx - 2, cy - 2, 4, 8, "#fff2a8"); // kit stripe
+
+    // Arms + gloves stretch toward ball when diving
+    const armY = cy - 2 + dive;
+    px(cx - 12, armY, 5, 5, "#e76e55");
+    px(cx + 7, armY, 5, 5, "#e76e55");
+    px(cx - 14, armY - 1, 5, 5, "#f4f6ff"); // left glove
+    px(cx + 9, armY - 1, 5, 5, "#f4f6ff"); // right glove
+
+    // Head
+    px(cx - 5, cy - 18, 10, 10, "#f0c8a0");
+    // Eyes
+    px(cx - 3, cy - 15, 2, 2, "#151b42");
+    px(cx + 1, cy - 15, 2, 2, "#151b42");
+    // Cap / hair
+    px(cx - 5, cy - 20, 10, 3, "#151b42");
+  }
+
   function drawBall() {
     ctx.fillStyle = "#f7d51d";
     ctx.beginPath();
@@ -747,17 +822,11 @@ const arena = (() => {
     ctx.strokeStyle = "#2a2300";
     ctx.lineWidth = 1.5;
     ctx.stroke();
-  }
-
-  function drawGoalie() {
-    if (!resolved) {
-      goalie.y += goalie.speed * goalie.dir;
-      if (goalie.y < canvas.height / 2 - 45 || goalie.y > canvas.height / 2 + 45) {
-        goalie.dir *= -1;
-      }
-    }
-    ctx.fillStyle = "#e76e55";
-    ctx.fillRect(goalie.x, goalie.y - goalie.h / 2, goalie.w, goalie.h);
+    // Ball pentagon hint
+    ctx.strokeStyle = "rgba(42,35,0,0.5)";
+    ctx.beginPath();
+    ctx.arc(ball.x - 2, ball.y - 1, 3, 0, Math.PI * 2);
+    ctx.stroke();
   }
 
   function drawMessage() {
@@ -790,6 +859,7 @@ const arena = (() => {
     const dt = lastTs ? Math.min(32, ts - lastTs) : 16;
     lastTs = ts;
     drawPitch();
+    drawShooter();
     drawGoalie();
     updateBall(dt);
     updateParticles();
