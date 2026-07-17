@@ -124,6 +124,7 @@ function addXp(amount) {
 
 async function connectWallet() {
   // Optional — x402 / CCTP / MCP / skills work without a wallet.
+  // Guest mode is a visible, clickable status (retry connect anytime).
   log("Connecting Injective wallet (Keplr)…", "info");
   if (window.keplr) {
     try {
@@ -133,8 +134,9 @@ async function connectWallet() {
       const address = accounts[0]?.address || "inj_operator";
       state.walletConnected = true;
       state.operator = `${address.slice(0, 8)}...${address.slice(-4)}`;
-      ui.walletConnect.textContent = "Connected";
-      ui.walletConnect.classList.add("btn-ghost");
+      ui.walletConnect.textContent = "Connected · retry";
+      ui.walletConnect.classList.remove("btn-primary", "btn-ghost");
+      ui.walletConnect.classList.add("btn-status");
       log(`Connected Keplr ${state.operator}`, "success");
       addXp(20);
       updateStats();
@@ -145,10 +147,11 @@ async function connectWallet() {
   }
   state.walletConnected = false;
   state.operator = "guest_ops";
-  ui.walletConnect.textContent = "Guest mode";
-  ui.walletConnect.classList.add("btn-ghost");
+  ui.walletConnect.textContent = "Guest · click to retry";
+  ui.walletConnect.classList.remove("btn-primary", "btn-ghost");
+  ui.walletConnect.classList.add("btn-status");
   log(
-    "No Keplr — continuing as guest. x402 / MCP / Skills still work on this host.",
+    "No Keplr — guest mode. Click the button anytime to retry. x402 / MCP / Skills still work.",
     "info"
   );
   updateStats();
@@ -547,8 +550,8 @@ const arena = (() => {
   const shootBtn = document.getElementById("btn-shoot");
   const ballStart = { x: 80, y: 130 };
   let ball = { x: ballStart.x, y: ballStart.y, vx: 0, vy: 0, r: 8, fired: false };
-  // Collision box for keeper (sprite drawn larger around this).
-  let goalie = { x: 0, y: 120, dir: 1, speed: 1.8, w: 14, h: 40 };
+  // Collision box for keeper (at far goal — top of pitch).
+  let goalie = { x: 0, y: 40, dir: 1, speed: 1.6, w: 16, h: 28 };
   let keeperDive = 0;
   let dragging = false;
   let dragPoint = { x: 0, y: 0 };
@@ -575,8 +578,11 @@ const arena = (() => {
     const rect = canvas.getBoundingClientRect();
     canvas.width = rect.width;
     canvas.height = rect.height;
-    goalie.x = canvas.width - 40;
-    ballStart.y = canvas.height / 2;
+    // Shooter near camera (bottom); keeper in the goal (top)
+    ballStart.x = canvas.width * 0.28;
+    ballStart.y = canvas.height * 0.78;
+    goalie.x = canvas.width * 0.5 - goalie.w / 2;
+    goalie.y = canvas.height * 0.22;
     if (!ball.fired) {
       ball.x = ballStart.x;
       ball.y = ballStart.y;
@@ -653,21 +659,120 @@ const arena = (() => {
   }
 
   function drawPitch() {
-    ctx.fillStyle = "#0b1030";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    const w = canvas.width;
+    const h = canvas.height;
+    // Sky / stands (camera looking up the pitch)
+    const sky = ctx.createLinearGradient(0, 0, 0, h * 0.22);
+    sky.addColorStop(0, "#0a1630");
+    sky.addColorStop(1, "#14301a");
+    ctx.fillStyle = sky;
+    ctx.fillRect(0, 0, w, h * 0.18);
+
+    // Perspective grass trapezoid (near = wide, far = narrow)
+    const nearL = 8;
+    const nearR = w - 8;
+    const farL = w * 0.18;
+    const farR = w * 0.82;
+    const topY = h * 0.14;
+    const botY = h - 8;
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(nearL, botY);
+    ctx.lineTo(nearR, botY);
+    ctx.lineTo(farR, topY);
+    ctx.lineTo(farL, topY);
+    ctx.closePath();
+    ctx.clip();
+
+    const stripes = 14;
+    for (let i = 0; i < stripes; i++) {
+      const t0 = i / stripes;
+      const t1 = (i + 1) / stripes;
+      const y0 = botY + (topY - botY) * t0;
+      const y1 = botY + (topY - botY) * t1;
+      const l0 = nearL + (farL - nearL) * t0;
+      const r0 = nearR + (farR - nearR) * t0;
+      const l1 = nearL + (farL - nearL) * t1;
+      const r1 = nearR + (farR - nearR) * t1;
+      ctx.beginPath();
+      ctx.moveTo(l0, y0);
+      ctx.lineTo(r0, y0);
+      ctx.lineTo(r1, y1);
+      ctx.lineTo(l1, y1);
+      ctx.closePath();
+      ctx.fillStyle = i % 2 === 0 ? "#2d7a3a" : "#246b32";
+      ctx.fill();
+    }
+
+    const light = ctx.createRadialGradient(
+      w * 0.35,
+      h * 0.3,
+      10,
+      w * 0.5,
+      h * 0.5,
+      w * 0.7
+    );
+    light.addColorStop(0, "rgba(255,255,200,0.08)");
+    light.addColorStop(1, "rgba(0,0,0,0.18)");
+    ctx.fillStyle = light;
+    ctx.fillRect(0, 0, w, h);
+
+    ctx.strokeStyle = "rgba(255,255,255,0.85)";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(nearL, botY);
+    ctx.lineTo(nearR, botY);
+    ctx.lineTo(farR, topY);
+    ctx.lineTo(farL, topY);
+    ctx.closePath();
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.ellipse(w / 2, h * 0.55, w * 0.12, h * 0.08, 0, 0, Math.PI * 2);
+    ctx.stroke();
+
+    const midY = h * 0.55;
+    const midT = (botY - midY) / (botY - topY);
+    const midL = nearL + (farL - nearL) * midT;
+    const midR = nearR + (farR - nearR) * midT;
+    ctx.beginPath();
+    ctx.moveTo(midL, midY);
+    ctx.lineTo(midR, midY);
+    ctx.stroke();
+
+    const boxTop = topY + 4;
+    const boxBot = topY + h * 0.22;
+    const boxL = w * 0.32;
+    const boxR = w * 0.68;
+    ctx.strokeRect(boxL, boxTop, boxR - boxL, boxBot - boxTop);
+
+    const goalL = w * 0.38;
+    const goalR = w * 0.62;
+    const goalY = topY + 2;
+    const postH = 28;
+    ctx.fillStyle = "#e8eef8";
+    ctx.fillRect(goalL, goalY - postH, 3, postH + 4);
+    ctx.fillRect(goalR - 3, goalY - postH, 3, postH + 4);
+    ctx.fillRect(goalL, goalY - postH, goalR - goalL, 3);
+    ctx.strokeStyle = "rgba(200,220,255,0.35)";
+    ctx.lineWidth = 1;
+    for (let i = 0; i < 5; i++) {
+      const nx = goalL + ((goalR - goalL) * i) / 4;
+      ctx.beginPath();
+      ctx.moveTo(nx, goalY - postH);
+      ctx.lineTo(nx, goalY);
+      ctx.stroke();
+    }
+
+    ctx.restore();
+
     if (flash > 0) {
       ctx.fillStyle = `rgba(247, 213, 29, ${flash * 0.22})`;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillRect(0, 0, w, h);
       flash *= 0.88;
       if (flash < 0.02) flash = 0;
     }
-    ctx.strokeStyle = "rgba(146, 204, 65, 0.35)";
-    ctx.lineWidth = 2;
-    ctx.strokeRect(6, 6, canvas.width - 12, canvas.height - 12);
-    ctx.strokeRect(canvas.width - 80, canvas.height / 2 - 50, 70, 100);
-    ctx.beginPath();
-    ctx.arc(canvas.width / 2, canvas.height / 2, 42, 0, Math.PI * 2);
-    ctx.stroke();
   }
 
   function updateParticles() {
@@ -692,49 +797,47 @@ const arena = (() => {
     flightMs += dt;
     ball.x += ball.vx;
     ball.y += ball.vy;
-    ball.vx *= 0.985;
-    ball.vy *= 0.985;
+    ball.vx *= 0.988;
+    ball.vy *= 0.988;
 
-    if (ball.y - ball.r < 6 || ball.y + ball.r > canvas.height - 6) {
-      ball.vy *= -0.85;
+    // Side touchlines
+    if (ball.x - ball.r < 10 || ball.x + ball.r > canvas.width - 10) {
+      ball.vx *= -0.7;
+      ball.x = Math.max(10 + ball.r, Math.min(canvas.width - 10 - ball.r, ball.x));
     }
-    if (ball.x - ball.r < 6) {
-      ball.vx *= -0.85;
+    // Near end (behind shooter)
+    if (ball.y + ball.r > canvas.height - 8) {
+      ball.vy *= -0.5;
+      ball.y = canvas.height - 8 - ball.r;
     }
 
     const gTop = goalie.y - goalie.h / 2;
     const gBottom = goalie.y + goalie.h / 2;
-    if (ball.x + ball.r >= goalie.x && ball.x - ball.r <= goalie.x + goalie.w) {
-      if (ball.y >= gTop && ball.y <= gBottom) {
-        resolveShot("blocked");
-        return;
-      }
+    if (
+      ball.x + ball.r >= goalie.x &&
+      ball.x - ball.r <= goalie.x + goalie.w &&
+      ball.y + ball.r >= gTop &&
+      ball.y - ball.r <= gBottom
+    ) {
+      resolveShot("blocked");
+      return;
     }
 
-    const goalTop = canvas.height / 2 - 35;
-    const goalBottom = canvas.height / 2 + 35;
-    if (ball.x + ball.r >= canvas.width - 14) {
-      if (ball.y >= goalTop && ball.y <= goalBottom) {
-        const gTop2 = goalie.y - goalie.h / 2;
-        const gBottom2 = goalie.y + goalie.h / 2;
-        const blockedByKeeper =
-          ball.x + ball.r >= goalie.x &&
-          ball.y >= gTop2 &&
-          ball.y <= gBottom2;
-        if (!blockedByKeeper) {
-          resolveShot("goal");
-        } else {
-          resolveShot("blocked");
-        }
+    // Goal line at far end (top)
+    const goalLine = canvas.height * 0.14 + 6;
+    const goalL = canvas.width * 0.38;
+    const goalR = canvas.width * 0.62;
+    if (ball.y - ball.r <= goalLine) {
+      if (ball.x >= goalL && ball.x <= goalR) {
+        resolveShot("goal");
       } else {
-        ball.vx *= -0.75;
-        ball.x = Math.min(ball.x, canvas.width - 20);
+        resolveShot("miss");
       }
       return;
     }
 
     const speed = Math.hypot(ball.vx, ball.vy);
-    if (speed < 0.35 && ball.x > canvas.width * 0.45) {
+    if (speed < 0.32 && flightMs > 900) {
       resolveShot("miss");
       return;
     }
@@ -798,10 +901,12 @@ const arena = (() => {
   /** Pixel goalkeeper — stays on the line; dive pose on block. */
   function drawGoalie() {
     if (!resolved) {
-      goalie.y += goalie.speed * goalie.dir;
-      if (goalie.y < canvas.height / 2 - 45 || goalie.y > canvas.height / 2 + 45) {
-        goalie.dir *= -1;
-      }
+      goalie.y = canvas.height * 0.22;
+      goalie.x += goalie.speed * goalie.dir;
+      const minX = canvas.width * 0.38;
+      const maxX = canvas.width * 0.62 - goalie.w;
+      if (goalie.x < minX || goalie.x > maxX) goalie.dir *= -1;
+      goalie.x = Math.max(minX, Math.min(maxX, goalie.x));
     }
     if (keeperDive > 0) keeperDive -= 1;
 
@@ -809,43 +914,42 @@ const arena = (() => {
     const cy = goalie.y;
     const diving = keeperDive > 0;
 
-    // Shadow
-    px(cx - 9, cy + 22, 18, 3, "rgba(0,0,0,0.4)");
+    px(cx - 9, cy + 16, 18, 3, "rgba(0,0,0,0.35)");
 
     if (diving) {
-      // Dive stretch toward ball side
-      px(cx - 4, cy + 8, 10, 6, "#1a2744"); // legs tucked
-      px(cx - 10, cy - 2, 20, 12, "#e76e55"); // torso horizontal-ish
-      px(cx - 16, cy - 4, 6, 6, "#f4f6ff"); // glove
+      px(cx - 4, cy + 6, 10, 6, "#1a2744");
+      px(cx - 10, cy - 2, 20, 12, "#e76e55");
+      px(cx - 16, cy - 4, 6, 6, "#f4f6ff");
       px(cx + 10, cy - 4, 6, 6, "#f4f6ff");
-      px(cx - 5, cy - 14, 10, 10, "#e8b890"); // head
+      px(cx - 5, cy - 14, 10, 10, "#e8b890");
       px(cx - 3, cy - 11, 2, 2, "#151b42");
       px(cx + 1, cy - 11, 2, 2, "#151b42");
-      px(cx - 5, cy - 16, 10, 3, "#151b42"); // hair
+      px(cx - 5, cy - 16, 10, 3, "#151b42");
       return;
     }
 
-    // Standing keeper
-    px(cx - 6, cy + 10, 4, 12, "#1a2744");
-    px(cx + 2, cy + 10, 4, 12, "#1a2744");
-    px(cx - 7, cy + 20, 5, 3, "#0a0e27");
-    px(cx + 2, cy + 20, 5, 3, "#0a0e27");
-
-    px(cx - 7, cy - 6, 14, 16, "#e76e55");
-    px(cx - 2, cy - 2, 4, 9, "#fff2a8");
-
-    px(cx - 12, cy - 2, 5, 8, "#e76e55");
-    px(cx + 7, cy - 2, 5, 8, "#e76e55");
+    px(cx - 6, cy + 8, 4, 10, "#1a2744");
+    px(cx + 2, cy + 8, 4, 10, "#1a2744");
+    px(cx - 7, cy + 16, 5, 3, "#0a0e27");
+    px(cx + 2, cy + 16, 5, 3, "#0a0e27");
+    px(cx - 7, cy - 6, 14, 14, "#e76e55");
+    px(cx - 2, cy - 2, 4, 8, "#fff2a8");
+    px(cx - 12, cy - 2, 5, 7, "#e76e55");
+    px(cx + 7, cy - 2, 5, 7, "#e76e55");
     px(cx - 14, cy - 3, 5, 5, "#f4f6ff");
     px(cx + 9, cy - 3, 5, 5, "#f4f6ff");
-
-    px(cx - 5, cy - 18, 10, 10, "#e8b890");
-    px(cx - 3, cy - 15, 2, 2, "#151b42");
-    px(cx + 1, cy - 15, 2, 2, "#151b42");
-    px(cx - 5, cy - 20, 10, 3, "#151b42");
+    px(cx - 5, cy - 16, 10, 10, "#e8b890");
+    px(cx - 3, cy - 13, 2, 2, "#151b42");
+    px(cx + 1, cy - 13, 2, 2, "#151b42");
+    px(cx - 5, cy - 18, 10, 3, "#151b42");
   }
 
   function drawBall() {
+    // Soft shadow for 3D pop
+    ctx.fillStyle = "rgba(0,0,0,0.35)";
+    ctx.beginPath();
+    ctx.ellipse(ball.x + 2, ball.y + 5, ball.r + 2, ball.r * 0.45, 0, 0, Math.PI * 2);
+    ctx.fill();
     ctx.fillStyle = "#f7d51d";
     ctx.beginPath();
     ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2);
@@ -902,9 +1006,11 @@ const arena = (() => {
 
   function kick(power, angle) {
     if (locked || ball.fired) return;
+    // Angle 0 = straight up the pitch toward goal; ± = curve left/right
     const rad = (angle * Math.PI) / 180;
-    ball.vx = (power / 8) * Math.cos(rad);
-    ball.vy = (power / 8) * Math.sin(rad);
+    const boost = 1 + state.accuracy / 200;
+    ball.vx = (power / 8) * Math.sin(rad) * boost;
+    ball.vy = -(power / 8) * Math.cos(rad) * boost;
     ball.fired = true;
     resolved = false;
     flightMs = 0;
@@ -939,13 +1045,18 @@ const arena = (() => {
     const dy = ball.y - dragPoint.y;
     const dist = Math.min(Math.hypot(dx, dy), 120);
     if (dist > 10) {
-      const angle = Math.round((Math.atan2(dy, dx) * 180) / Math.PI);
+      // Pull back → shoot toward goal (up). Angle 0 = straight up.
+      const shotDx = ball.x - dragPoint.x;
+      const shotDy = ball.y - dragPoint.y;
+      const angle = Math.round(
+        (Math.atan2(shotDx, -shotDy) * 180) / Math.PI
+      );
       const power = Math.min(100, Math.round(dist));
       ui.strikeAngle.value = Math.max(-35, Math.min(35, angle));
       ui.strikePower.value = power;
       ui.angleVal.textContent = `${ui.strikeAngle.value}°`;
       ui.powerVal.textContent = `${ui.strikePower.value}`;
-      kick(power, ui.strikeAngle.value);
+      kick(power, parseInt(ui.strikeAngle.value, 10));
     }
   }
 

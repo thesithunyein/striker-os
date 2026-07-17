@@ -160,14 +160,29 @@ h3 {
 }
 
 .btn-ghost {
-  background: transparent;
-  box-shadow: none;
+  background: var(--panel-2);
+  color: var(--text);
+  border-color: var(--line-strong);
+  box-shadow: var(--shadow-sm);
 }
 
 .btn-ghost:hover {
-  background: rgba(255, 255, 255, 0.05);
-  box-shadow: none;
-  transform: none;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--gold);
+  border-color: var(--gold);
+}
+
+.btn-status {
+  background: var(--bg-2);
+  color: var(--gold);
+  border-color: var(--gold);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+}
+
+.btn-status:hover {
+  background: rgba(247, 213, 29, 0.12);
+  transform: translate(-1px, -1px);
 }
 
 /* ---------- Chips ---------- */
