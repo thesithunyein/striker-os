@@ -94,7 +94,9 @@ function updateStats() {
   ui.statGoals.textContent = state.goals;
   ui.statUsdc.textContent = `$${state.usdc.toFixed(2)}`;
   ui.statAccuracy.textContent = `${state.accuracy}%`;
-  ui.walletBalance.textContent = `${state.usdc.toFixed(2)} USDC ${state.walletConnected ? "" : "(demo)"}`;
+  ui.walletBalance.textContent = state.walletConnected
+    ? `${state.usdc.toFixed(2)} USDC`
+    : `${state.usdc.toFixed(2)} USDC · demo`;
 }
 
 function addXp(amount) {

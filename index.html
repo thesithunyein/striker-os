@@ -13,7 +13,7 @@
 <body>
   <div class="app">
     <header class="top rise">
-      <div class="brand">
+      <a class="brand" href="#">
         <svg class="brand-mark" viewBox="0 0 16 16" shape-rendering="crispEdges" aria-hidden="true">
           <rect x="0" y="0" width="16" height="16" fill="#151b42"/>
           <rect x="4" y="2" width="8" height="1" fill="#f7d51d"/>
@@ -28,116 +28,91 @@
           <rect x="11" y="8" width="1" height="1" fill="#151b42"/>
         </svg>
         <div>
-          <div class="eyebrow">Injective Global Cup</div>
           <h1>STRIKER <span>OS</span></h1>
-          <p>World Cup fan intel · pay-per-query · agent-ready</p>
+          <p>World Cup intel on Injective</p>
         </div>
-      </div>
+      </a>
 
-      <div class="nav">
+      <nav class="nav" aria-label="Primary">
         <a href="#tech">Tech</a>
         <a href="#oracle">Oracle</a>
-        <a href="#arena">Goal Battle</a>
+        <a href="#arena">Arena</a>
         <a href="#fixtures">Fixtures</a>
-        <a href="README.md" target="_blank" rel="noopener">README</a>
-      </div>
+      </nav>
 
       <div class="wallet-bar">
-        <span class="chip chip-live"><span class="chip-dot"></span> injective-1</span>
-        <span class="balance" id="wallet-balance">25.00 USDC (demo)</span>
-        <button class="btn btn-primary" type="button" id="wallet-connect">Connect wallet</button>
+        <span class="chip chip-live"><span class="chip-dot" aria-hidden="true"></span> injective-1</span>
+        <span class="balance" id="wallet-balance">25.00 USDC</span>
+        <button class="btn btn-primary" type="button" id="wallet-connect">Connect</button>
       </div>
     </header>
 
     <section class="hero rise rise-delay-1">
-      <div class="panel panel-pad">
-        <div class="eyebrow">Problem</div>
-        <h2>World Cup intel that agents can actually buy.</h2>
+      <div class="hero-copy">
+        <p class="eyebrow">Injective Global Cup</p>
+        <h2>Match intel agents can buy.</h2>
         <p class="lead">
-          Fans and AI agents need knockout context without API-key sprawl.
-          Striker OS packages match boards, prediction skills, and Injective payment rails in one usable desk.
+          One desk for live fixtures, pay-per-query x402 intel, MCP tools, and Goal Battle clips —
+          no API-key sprawl during knockout week.
         </p>
         <div class="hero-actions">
-          <a class="btn btn-primary" href="#tech">Try Injective tech</a>
-          <a class="btn" href="#arena">Open Goal Battle</a>
-          <a class="btn btn-ghost" href="#fixtures">Live fixtures</a>
-        </div>
-        <div class="hero-meta">
-          <div class="pill">x402 pay-per-query</div>
-          <div class="pill">USDC CCTP bridging</div>
-          <div class="pill">MCP Server ready</div>
-          <div class="pill">Agent Skills packs</div>
+          <a class="btn btn-primary" href="#tech">Try x402</a>
+          <a class="btn" href="#arena">Goal Battle</a>
         </div>
       </div>
-      <div class="panel panel-pad">
-        <div class="card-head">
+
+      <aside class="hero-desk panel" aria-label="Operator status">
+        <div class="desk-top">
           <div>
-            <div class="eyebrow">Operator desk</div>
-            <h3>Matchday command</h3>
+            <p class="eyebrow">Operator</p>
+            <p class="desk-name" id="operator-name">guest</p>
           </div>
           <div class="avatar-stack">
-            <img src="assets/avatar-ops.png" alt="Operator avatar" />
-            <img src="assets/avatar-pro.png" alt="Analyst avatar" />
-          </div>
-        </div>
-        <div class="mascot-row">
-          <img src="assets/mascot.png" alt="Striker OS mascot" />
-          <div>
-            <strong>Mascot guide</strong>
-            <span>Friendly intel cues, Codedex-style.</span>
+            <img src="assets/avatar-ops.png" alt="" />
+            <img src="assets/avatar-pro.png" alt="" />
           </div>
         </div>
         <div class="stat-grid">
           <div class="stat">
-            <div class="label">Operator</div>
-            <div class="value" id="operator-name" style="font-size:1rem">guest</div>
+            <span class="label">XP</span>
+            <strong class="value" id="stat-xp">120</strong>
           </div>
           <div class="stat">
-            <div class="label">XP</div>
-            <div class="value" id="stat-xp">120</div>
+            <span class="label">Goals</span>
+            <strong class="value" id="stat-goals">0</strong>
           </div>
           <div class="stat">
-            <div class="label">Goals</div>
-            <div class="value" id="stat-goals">0</div>
+            <span class="label">USDC</span>
+            <strong class="value" id="stat-usdc">$25.00</strong>
           </div>
           <div class="stat">
-            <div class="label">USDC</div>
-            <div class="value" id="stat-usdc">$25.00</div>
+            <span class="label">Accuracy</span>
+            <strong class="value" id="stat-accuracy">42%</strong>
           </div>
         </div>
-        <p style="margin:0.9rem 0 0;color:var(--muted);font-size:0.8rem;line-height:1.45">
-          MCP status: <strong id="mcp-status" style="color:var(--accent)">ACTIVE</strong>
-          · Accuracy boost: <strong id="stat-accuracy" style="color:var(--accent)">42%</strong>
-        </p>
-        <div class="mini-rail">
-          <div>
-            <span>Season pass</span>
-            <strong>Premium demo</strong>
-          </div>
-          <div>
-            <span>Oracle uptime</span>
-            <strong>99.8%</strong>
-          </div>
+        <div class="desk-status">
+          <span>MCP <strong id="mcp-status">ACTIVE</strong></span>
+          <img class="desk-mascot" src="assets/mascot.png" alt="" />
         </div>
-      </div>
+      </aside>
     </section>
 
     <section id="tech" class="tech-strip rise rise-delay-2" aria-label="Injective technologies">
       <button class="tech-card active" type="button" data-tech="x402">
         <strong>x402</strong>
-        <span>Pay 0.01 USDC per match-intel request — HTTP 402 flow</span>
+        <span>Pay-per-query match intel</span>
       </button>
       <button class="tech-card" type="button" data-tech="cctp">
         <strong>CCTP</strong>
-        <span>Bridge native USDC into Injective to fund the agent</span>
+        <span>Bridge USDC to Injective</span>
       </button>
       <button class="tech-card" type="button" data-tech="mcp">
-        <strong>MCP Server</strong>
-        <span>Tool surface for balances, USDC info, CCTP status</span>
+        <strong>MCP</strong>
+        <span>Live fixtures as agent tools</span>
       </button>
       <button class="tech-card" type="button" data-tech="skills">
-        <strong>Agent Skills</strong>
-        <span>Reusable workflows: sentiment, odds, USDC, MCP setup</span>
+        <strong>Skills</strong>
+        <span>Reusable agent workflows</span>
       </button>
     </section>
 
@@ -146,66 +121,66 @@
         <section class="panel panel-pad">
           <div class="section-head">
             <div>
-              <h3>Injective technology desk</h3>
-              <p>Each tab maps to a real Injective building block. Demo buttons simulate the flow; README links production wiring.</p>
+              <h3>Technology desk</h3>
+              <p>Pick a tab, run the flow. Live on Vercel — no localhost needed.</p>
             </div>
           </div>
 
           <div class="tech-demo active" data-demo="x402">
-            <div class="flow-steps">
-              <div class="flow-step"><span class="n">01</span><p>Client requests <code>/api/match-intel</code></p></div>
-              <div class="flow-step"><span class="n">02</span><p>Server returns <strong>HTTP 402</strong> with USDC quote (x402)</p></div>
-              <div class="flow-step"><span class="n">03</span><p>Wallet signs payment · facilitator settles on Injective (~650ms)</p></div>
-              <div class="flow-step"><span class="n">04</span><p>Retry with receipt · intel unlocked (no API key)</p></div>
-            </div>
+            <ol class="flow-steps">
+              <li class="flow-step"><span class="n">01</span><p>Request <code>/api/match-intel</code></p></li>
+              <li class="flow-step"><span class="n">02</span><p>Server returns <strong>HTTP 402</strong> + USDC quote</p></li>
+              <li class="flow-step"><span class="n">03</span><p>Payment settles on Injective (~650ms)</p></li>
+              <li class="flow-step"><span class="n">04</span><p>Retry with receipt → intel unlocked</p></li>
+            </ol>
             <div class="row">
-              <button class="btn btn-primary" type="button" id="btn-x402">Pay x402 fee (0.01 USDC)</button>
-              <button class="btn" type="button" id="btn-x402-log">View receipt log</button>
+              <button class="btn btn-primary" type="button" id="btn-x402">Pay 0.01 USDC</button>
+              <button class="btn btn-ghost" type="button" id="btn-x402-log">Receipt log</button>
             </div>
           </div>
 
           <div class="tech-demo" data-demo="cctp">
-            <div class="flow-steps">
-              <div class="flow-step"><span class="n">01</span><p><code>cctp_supported_chains</code> — pick source chain</p></div>
-              <div class="flow-step"><span class="n">02</span><p>Burn USDC on source · wait Iris attestation</p></div>
-              <div class="flow-step"><span class="n">03</span><p><code>cctp_mint</code> on Injective EVM → native USDC</p></div>
-              <div class="flow-step"><span class="n">04</span><p>Fund x402 spend for World Cup queries</p></div>
-            </div>
+            <ol class="flow-steps">
+              <li class="flow-step"><span class="n">01</span><p><code>cctp_supported_chains</code> — pick source</p></li>
+              <li class="flow-step"><span class="n">02</span><p>Burn USDC · wait Iris attestation</p></li>
+              <li class="flow-step"><span class="n">03</span><p><code>cctp_mint</code> on Injective EVM</p></li>
+              <li class="flow-step"><span class="n">04</span><p>Fund x402 spend for match queries</p></li>
+            </ol>
             <div class="row">
-              <button class="btn btn-warn" type="button" id="btn-cctp">Simulate CCTP +50 USDC</button>
-              <button class="btn" type="button" id="btn-cctp-log">View attestation log</button>
+              <button class="btn btn-warn" type="button" id="btn-cctp">Simulate +50 USDC</button>
+              <button class="btn btn-ghost" type="button" id="btn-cctp-log">Attestation log</button>
             </div>
           </div>
 
           <div class="tech-demo" data-demo="mcp">
-            <div class="flow-steps">
-              <div class="flow-step"><span class="n">01</span><p>Run <a href="https://github.com/InjectiveLabs/mcp-server" target="_blank" rel="noopener" style="color:var(--accent)">InjectiveLabs/mcp-server</a></p></div>
-              <div class="flow-step"><span class="n">02</span><p>Connect from Cursor / Claude as an MCP client</p></div>
-              <div class="flow-step"><span class="n">03</span><p>Call USDC + CCTP tools beside this UI</p></div>
-            </div>
+            <ol class="flow-steps">
+              <li class="flow-step"><span class="n">01</span><p>Run Striker MCP via <code>npm run mcp</code></p></li>
+              <li class="flow-step"><span class="n">02</span><p>Add to Cursor / Claude with <code>mcp.json</code></p></li>
+              <li class="flow-step"><span class="n">03</span><p>Call <code>worldcup_fixtures</code> live</p></li>
+            </ol>
             <div class="row">
-              <button class="btn" type="button" id="btn-mcp-ping">Ping MCP catalog</button>
-              <button class="btn" type="button" id="btn-mcp-usdc">usdc_native_info</button>
+              <button class="btn" type="button" id="btn-mcp-ping">Ping API</button>
+              <button class="btn" type="button" id="btn-mcp-usdc">Pull fixtures</button>
             </div>
           </div>
 
           <div class="tech-demo" data-demo="skills">
-            <div class="skills" style="margin-top:0.4rem">
+            <div class="skills">
               <button class="btn skill-btn" type="button" data-skill="sentiment">
-                <strong>Sentiment scraper</strong>
-                <span>Fan signal for Final-week matches</span>
+                <strong>Sentiment</strong>
+                <span>Fan signal for Final week</span>
               </button>
               <button class="btn skill-btn" type="button" data-skill="prediction">
-                <strong>Probability solver</strong>
-                <span>Knockout win bands + x402 boost</span>
+                <strong>Probability</strong>
+                <span>Knockout win bands</span>
               </button>
               <button class="btn skill-btn" type="button" data-skill="cctpSkill">
-                <strong>USDC / CCTP skill</strong>
-                <span>injective-usdc-integration checklist</span>
+                <strong>USDC / CCTP</strong>
+                <span>injective-usdc-integration</span>
               </button>
               <button class="btn skill-btn" type="button" data-skill="mcpSkill">
-                <strong>MCP servers skill</strong>
-                <span>injective-mcp-servers install path</span>
+                <strong>MCP servers</strong>
+                <span>injective-mcp-servers</span>
               </button>
             </div>
           </div>
@@ -215,28 +190,28 @@
           <div class="section-head">
             <div>
               <h3>Sports oracle</h3>
-              <p>Works offline with the built-in WC2026 demo pack. Optional Gemini key for live grounded search.</p>
+              <p>Ask a match question — live data first, WC2026 pack as fallback.</p>
             </div>
           </div>
           <div class="query-row">
-            <input id="sports-query" type="text" placeholder="e.g. Who is in the World Cup 2026 Final?" />
-            <button class="btn btn-primary" type="button" id="btn-oracle">Run inquiry</button>
+            <input id="sports-query" type="text" placeholder="Who is in the World Cup Final?" autocomplete="off" />
+            <button class="btn btn-primary" type="button" id="btn-oracle">Ask</button>
           </div>
-          <div class="oracle-out" id="oracle-output">Waiting for a query. Try a fixture Analyze button or ask about Spain / Final.</div>
+          <div class="oracle-out" id="oracle-output">Try “Spain”, “Final”, or hit Analyze on a fixture.</div>
         </section>
 
         <section class="panel panel-pad" id="arena">
           <div class="section-head">
             <div>
-              <h3>Goal Battle arena</h3>
-              <p>Drag the ball back and release to shoot. x402 / skills raise accuracy boost.</p>
+              <h3>Goal Battle</h3>
+              <p>Drag the ball back and release. x402 intel raises accuracy.</p>
             </div>
           </div>
           <div class="arena-wrap">
-            <canvas id="pitch"></canvas>
+            <canvas id="pitch" aria-label="Goal Battle pitch"></canvas>
             <div class="arena-hud">
-              <span>Drag ball to aim</span>
-              <span>Accuracy linked to intel boosts</span>
+              <span>Drag to aim</span>
+              <span>Accuracy ↔ intel</span>
             </div>
           </div>
           <div class="controls">
@@ -245,18 +220,13 @@
               <input id="strike-angle" type="range" min="-35" max="35" value="0" />
               <label><span>Power</span><span id="power-val">65</span></label>
               <input id="strike-power" type="range" min="30" max="100" value="65" />
-              <button class="btn btn-primary" type="button" id="btn-shoot" style="width:100%">Execute strike</button>
+              <button class="btn btn-primary" type="button" id="btn-shoot">Shoot</button>
             </div>
-            <div>
-              <p style="margin:0 0 0.65rem;color:var(--muted);font-size:0.8rem;line-height:1.45">
-                Use CCTP to fund USDC, x402 to unlock sharper intel (accuracy), then practice finishes here for demo clips.
-              </p>
-              <p style="margin:0;font-family:var(--font-mono);font-size:0.7rem;color:var(--muted)">
-                Tip for Goal Battle prize posts: record a full shoot demo after paying x402.
-              </p>
+            <div class="arena-tip">
+              <p>Pay x402 first for a sharper finish — great clip for Goal Battle posts.</p>
               <div class="sprite-row">
-                <img src="assets/sprite-red.png" alt="Sprite 1" />
-                <img src="assets/sprite-green.png" alt="Sprite 2" />
+                <img src="assets/sprite-red.png" alt="" />
+                <img src="assets/sprite-green.png" alt="" />
               </div>
             </div>
           </div>
@@ -267,10 +237,10 @@
         <section class="panel panel-pad" id="fixtures">
           <div class="section-head">
             <div>
-              <h3>Live match board</h3>
-              <p>Real fixtures from a live sports API · configurable to the World Cup feed</p>
+              <h3>Match board</h3>
+              <p>Live sports feed</p>
             </div>
-            <span id="fixtures-source" class="chip"><span class="chip-dot"></span> LOADING</span>
+            <span id="fixtures-source" class="chip"><span class="chip-dot" aria-hidden="true"></span> LOADING</span>
           </div>
           <div id="fixture-list"></div>
         </section>
@@ -279,35 +249,10 @@
           <div class="section-head">
             <div>
               <h3>System log</h3>
-              <p>x402 / CCTP / MCP traces</p>
+              <p>x402 · CCTP · MCP</p>
             </div>
           </div>
-          <div class="console" id="live-console"></div>
-        </section>
-
-        <section class="panel panel-pad">
-          <div class="section-head">
-            <div>
-              <h3>Operator crew</h3>
-              <p>Injective-ready agents on deck</p>
-            </div>
-          </div>
-          <div class="crew">
-            <div>
-              <img src="assets/avatar-ops.png" alt="Ops avatar" />
-              <div>
-                <strong>Ops Captain</strong>
-                <span>Wallet + MCP monitor</span>
-              </div>
-            </div>
-            <div>
-              <img src="assets/avatar-pro.png" alt="Analyst avatar" />
-              <div>
-                <strong>Oracle Analyst</strong>
-                <span>Match intel synthesis</span>
-              </div>
-            </div>
-          </div>
+          <div class="console" id="live-console" aria-live="polite"></div>
         </section>
       </aside>
     </div>
