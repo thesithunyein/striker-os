@@ -564,6 +564,70 @@ header.top {
   gap: 0.55rem;
 }
 
+.proof-out {
+  margin: 0.85rem 0 0;
+  padding: 0.85rem;
+  border: 2px solid var(--line);
+  background: #070b22;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  line-height: 1.5;
+  color: #c8d2ff;
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 220px;
+  overflow: auto;
+}
+
+.curl-box {
+  margin-top: 0.65rem;
+  padding: 0.65rem 0.75rem;
+  border: 2px dashed var(--line-strong);
+  background: var(--bg-2);
+  display: grid;
+  gap: 0.35rem;
+}
+
+.curl-label {
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+.curl-box code {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text);
+  word-break: break-all;
+}
+
+.skills-intro {
+  margin: 0 0 0.75rem;
+  color: var(--muted);
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.skills-intro a {
+  color: var(--gold);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.board-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin: -0.35rem 0 0.75rem;
+}
+
+.board-actions .btn {
+  font-size: 0.5rem;
+  padding: 0.45rem 0.6rem;
+}
+
 /* ---------- Skills ---------- */
 .skills {
   display: grid;

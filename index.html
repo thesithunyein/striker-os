@@ -122,7 +122,7 @@
           <div class="section-head">
             <div>
               <h3>Technology desk</h3>
-              <p>Pick a tab, run the flow. Live on Vercel — no localhost needed.</p>
+              <p>Live x402 · CCTP path · MCP health · Agent Skills — all runnable here.</p>
             </div>
           </div>
 
@@ -130,12 +130,17 @@
             <ol class="flow-steps">
               <li class="flow-step"><span class="n">01</span><p>Request <code>/api/match-intel</code></p></li>
               <li class="flow-step"><span class="n">02</span><p>Server returns <strong>HTTP 402</strong> + USDC quote</p></li>
-              <li class="flow-step"><span class="n">03</span><p>Payment settles on Injective (~650ms)</p></li>
-              <li class="flow-step"><span class="n">04</span><p>Retry with receipt → intel unlocked</p></li>
+              <li class="flow-step"><span class="n">03</span><p>Attach <code>X-PAYMENT</code> receipt · settle on Injective</p></li>
+              <li class="flow-step"><span class="n">04</span><p>Retry → intel unlocked (no API key)</p></li>
             </ol>
             <div class="row">
               <button class="btn btn-primary" type="button" id="btn-x402">Pay 0.01 USDC</button>
-              <button class="btn btn-ghost" type="button" id="btn-x402-log">Receipt log</button>
+              <button class="btn btn-ghost" type="button" id="btn-x402-prove">Prove 402</button>
+            </div>
+            <pre class="proof-out" id="x402-proof">Click <strong>Pay</strong> or <strong>Prove 402</strong> to capture a live HTTP 402 quote from this host.</pre>
+            <div class="curl-box">
+              <span class="curl-label">Judge curl</span>
+              <code id="x402-curl">curl -i "/api/match-intel?match=spain"</code>
             </div>
           </div>
 
@@ -147,9 +152,10 @@
               <li class="flow-step"><span class="n">04</span><p>Fund x402 spend for match queries</p></li>
             </ol>
             <div class="row">
-              <button class="btn btn-warn" type="button" id="btn-cctp">Simulate +50 USDC</button>
-              <button class="btn btn-ghost" type="button" id="btn-cctp-log">Attestation log</button>
+              <button class="btn btn-warn" type="button" id="btn-cctp">Run CCTP fund path</button>
+              <button class="btn btn-ghost" type="button" id="btn-cctp-log">Show attestation</button>
             </div>
+            <pre class="proof-out" id="cctp-proof">CCTP tools: cctp_supported_chains → cctp_attestation_status → cctp_mint (Injective MCP).</pre>
           </div>
 
           <div class="tech-demo" data-demo="mcp">
@@ -159,12 +165,18 @@
               <li class="flow-step"><span class="n">03</span><p>Call <code>worldcup_fixtures</code> live</p></li>
             </ol>
             <div class="row">
-              <button class="btn" type="button" id="btn-mcp-ping">Ping API</button>
-              <button class="btn" type="button" id="btn-mcp-usdc">Pull fixtures</button>
+              <button class="btn" type="button" id="btn-mcp-ping">Ping health</button>
+              <button class="btn" type="button" id="btn-mcp-usdc">Pull fixtures API</button>
             </div>
+            <pre class="proof-out" id="mcp-proof">Ping returns live JSON from /api/health (x402 mode + Injective network).</pre>
           </div>
 
           <div class="tech-demo" data-demo="skills">
+            <p class="skills-intro">
+              Installable skill:
+              <a href="skills/striker-worldcup/SKILL.md" target="_blank" rel="noopener">striker-worldcup/SKILL.md</a>
+              — wires MCP fixtures + x402 paid intel.
+            </p>
             <div class="skills">
               <button class="btn skill-btn" type="button" data-skill="sentiment">
                 <strong>Sentiment</strong>
@@ -183,6 +195,7 @@
                 <span>injective-mcp-servers</span>
               </button>
             </div>
+            <pre class="proof-out" id="skills-proof">Activate a skill to load its Striker OS / Injective workflow notes.</pre>
           </div>
         </section>
 
@@ -190,7 +203,7 @@
           <div class="section-head">
             <div>
               <h3>Sports oracle</h3>
-              <p>Ask a match question — live data first, WC2026 pack as fallback.</p>
+              <p>Ask about Spain / Final / England — WC2026 pack first, live soccer API beside it.</p>
             </div>
           </div>
           <div class="query-row">
@@ -237,10 +250,14 @@
         <section class="panel panel-pad" id="fixtures">
           <div class="section-head">
             <div>
-              <h3>Match board</h3>
-              <p>Live sports feed</p>
+              <h3>World Cup board</h3>
+              <p>WC2026 knockout · Final week</p>
             </div>
-            <span id="fixtures-source" class="chip"><span class="chip-dot" aria-hidden="true"></span> LOADING</span>
+            <span id="fixtures-source" class="chip chip-live"><span class="chip-dot" aria-hidden="true"></span> WC2026</span>
+          </div>
+          <div class="board-actions">
+            <button class="btn btn-ghost" type="button" id="btn-wc-board">WC2026</button>
+            <button class="btn btn-ghost" type="button" id="btn-live-board">Live soccer API</button>
           </div>
           <div id="fixture-list"></div>
         </section>

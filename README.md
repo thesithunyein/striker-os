@@ -146,11 +146,14 @@ Backend: see `.env.example` (`X402_NETWORK`, `X402_PRICE`, `X402_PAY_TO`, `X402_
 
 ## Demo path for judges (2 minutes)
 
-1. **Live match board** → real fixtures load with a LIVE badge
-2. **x402 tab** → click pay → app performs the real 402 handshake against the backend and unlocks intel
-3. **MCP tab** → ping `/health` (shows `x402: live-middleware`) + pull live fixtures
-4. `npm run mcp` → add to Cursor and call `worldcup_fixtures`
-5. **Goal Battle** → drag‑shoot a goal for a social clip
+1. Open the live site → **World Cup board** shows WC2026 knockout (Final week)
+2. **x402 tab** → click **Prove 402** (or Pay) → see live HTTP `402` JSON quote → intel unlock
+3. Copy the **Judge curl** and run it — same 402 response from production
+4. **MCP tab** → health JSON shows `x402` + Injective network (`eip155:1439`)
+5. **Skills** → open `skills/striker-worldcup/SKILL.md`
+6. **Goal Battle** → shoot a clip for social posts
+
+Optional: toggle **Live soccer API** on the board for TheSportsDB feed beside the WC pack.
 
 ---
 

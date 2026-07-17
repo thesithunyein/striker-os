@@ -1,53 +1,13 @@
-window.WC2026_FIXTURES = [
-  {
-    match: "BRA vs GER",
-    stage: "Quarter-final (demo)",
-    date: "Jul 20, 2026"
-  },
-  {
-    match: "ARG vs FRA",
-    stage: "Quarter-final (demo)",
-    date: "Jul 21, 2026"
-  },
-  {
-    match: "ENG vs ESP",
-    stage: "Semi-final (demo)",
-    date: "Jul 25, 2026"
-  }
-];
-
-window.WC2026_KNOWLEDGE = [
-  {
-    keywords: ["final", "champion", "winner"],
-    answer:
-      "Demo pack: The WC2026 final is a placeholder in this build. Replace this answer with your live data source or Gemini grounding."
-  },
-  {
-    keywords: ["inj", "injective", "x402"],
-    answer:
-      "Striker OS uses x402 to gate match intel per query. The demo simulates HTTP 402 → USDC payment → receipt → unlock flow."
-  },
-  {
-    keywords: ["cctp", "usdc", "bridge"],
-    answer:
-      "CCTP demo: burn USDC on the source chain, wait for attestation, mint native USDC on Injective, then fund x402 queries."
-  },
-  {
-    keywords: ["fixtures", "schedule", "knockout"],
-    answer:
-      "Demo fixtures are loaded from a local WC2026 pack. Update `data/worldcup-2026.js` or connect a live API."
-  }
-];
 /**
- * FIFA World Cup 2026 — knockout snapshot for Striker OS demos.
+ * FIFA World Cup 2026 — knockout snapshot for Striker OS.
+ * Primary board data for judges / screenshots (Final week context).
  * Hosts: Canada, Mexico, USA · Final: 19 July 2026 (MetLife / NY-NJ area)
- * Update results as the tournament progresses for live screenshots.
  */
 window.WC2026 = {
   tournament: "FIFA World Cup 2026",
   hosts: ["Canada", "Mexico", "United States"],
   stage: "Knockout — Semi-finals / Final week",
-  updated: "2026-07-16",
+  updated: "2026-07-17",
   fixtures: [
     {
       id: "sf1",
@@ -72,7 +32,7 @@ window.WC2026 = {
       awayCode: "ARG",
       venue: "Atlanta Stadium",
       score: null,
-      status: "Scheduled / Live window",
+      status: "Scheduled",
       note: "Winner faces Spain in the Final"
     },
     {
@@ -106,8 +66,52 @@ window.WC2026 = {
     format:
       "48 teams · 12 groups · Round of 32 through Final. Group stage 11–27 June; knockout from 28 June; Final 19 July.",
     problem:
-      "Fans need one place to combine live match context, prediction signals, and pay-per-query sports intel without API-key sprawl — especially during Final week.",
+      "Fans need one place for live match context, prediction signals, and pay-per-query sports intel without API-key sprawl — especially during Final week.",
     injectiveAngle:
       "x402 pays for match intel per request; CCTP funds the agent wallet with native USDC; MCP exposes chain tools to AI; Agent Skills encode reusable Injective workflows."
   }
 };
+
+window.WC2026_FIXTURES = (window.WC2026.fixtures || []).map((f) => ({
+  match: `${f.homeCode || f.home} vs ${f.awayCode || f.away}`,
+  stage: `WC2026 · ${f.round}`,
+  date: f.date,
+  score: f.score || f.status || "Upcoming",
+  venue: f.venue,
+  note: f.note,
+  home: f.home,
+  away: f.away
+}));
+
+window.WC2026_KNOWLEDGE = [
+  {
+    keywords: ["final", "champion", "winner", "spain"],
+    answer:
+      "WC2026 Final week: Spain are in the Final (beat France 2–0 in the SF). The other finalist is the winner of England vs Argentina. Kickoff 19 July 2026 · MetLife area (NY/NJ). Striker OS gates deeper win-probability reads behind x402."
+  },
+  {
+    keywords: ["england", "argentina", "semi"],
+    answer:
+      "Semi-final 2: England vs Argentina (15 July 2026, Atlanta). Winner meets Spain in the Final. Use Analyze → Pay x402 for a graded intel unlock."
+  },
+  {
+    keywords: ["france", "third", "bronze"],
+    answer:
+      "France lost the SF to Spain (0–2) and may play the third-place match on 18 July in Miami against the loser of England/Argentina."
+  },
+  {
+    keywords: ["inj", "injective", "x402"],
+    answer:
+      "Striker OS gates match intel with x402: GET /api/match-intel → HTTP 402 + USDC quote on Injective (eip155:1439) → retry with X-PAYMENT → intel unlocked. No API key signup."
+  },
+  {
+    keywords: ["cctp", "usdc", "bridge"],
+    answer:
+      "CCTP path: pick source chain → burn USDC → Iris attestation → cctp_mint on Injective EVM → native USDC funds x402 spend. Wired to Injective MCP CCTP tools."
+  },
+  {
+    keywords: ["fixtures", "schedule", "knockout", "world cup"],
+    answer:
+      "WC2026 knockout board is loaded from the Striker OS World Cup pack. Live soccer API + MCP tools (worldcup_fixtures) sit beside it for agent workflows."
+  }
+];
