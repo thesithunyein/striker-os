@@ -89,19 +89,24 @@ window.WC2026_FIXTURES = (window.WC2026.fixtures || []).map((f) => ({
 
 window.WC2026_KNOWLEDGE = [
   {
-    keywords: ["final", "champion", "winner", "spain", "argentina"],
+    keywords: ["final", "champion", "winner", "spain", "argentina", "esp", "arg"],
     answer:
       "WC2026 Final: Spain vs Argentina · 19 July 2026 · MetLife area (NY/NJ). Spain beat France 2–0 in the SF; Argentina beat England 2–1 (late comeback). Striker OS gates deeper win-probability reads behind x402."
   },
   {
-    keywords: ["england", "semi"],
+    keywords: ["england", "semi", "eng"],
     answer:
       "Semi-final 2 (15 July, Atlanta): England 1–2 Argentina. Gordon 55; Fernandez 85, Martinez 90+2. England play France in the third-place match (18 July, Miami)."
   },
   {
-    keywords: ["france", "third", "bronze"],
+    keywords: ["france", "third", "bronze", "fra"],
     answer:
       "Third-place: France vs England · 18 July 2026 · Miami. France lost the SF to Spain 0–2; England lost the SF to Argentina 1–2."
+  },
+  {
+    keywords: ["fra vs esp", "france vs spain", "esp vs fra"],
+    answer:
+      "Semi-final 1 (14 July, Dallas): France 0–2 Spain. Spain advanced to the Final vs Argentina."
   },
   {
     keywords: ["inj", "injective", "x402"],

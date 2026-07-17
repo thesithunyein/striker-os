@@ -373,8 +373,9 @@ function answerFromPack(prompt) {
   const fallback =
     "No direct hit. Try “Spain”, “Final”, “England”, or Analyze a WC2026 fixture — then Pay x402 for a graded unlock.";
   if (!window.WC2026_KNOWLEDGE) return fallback;
+  const q = prompt.toLowerCase();
   const hit = window.WC2026_KNOWLEDGE.find((entry) =>
-    entry.keywords.some((kw) => prompt.toLowerCase().includes(kw))
+    entry.keywords.some((kw) => q.includes(kw))
   );
   return hit ? hit.answer : fallback;
 }
@@ -383,38 +384,69 @@ function wcBoardFixtures() {
   return window.WC2026_FIXTURES || [];
 }
 
-async function liveMatchIntel(prompt) {
+/** Match Analyze queries like "… FRA vs ESP" and names like "France". */
+function scoreFixtureAgainstQuery(f, prompt) {
   const q = prompt.toLowerCase();
+  const home = (f.home || "").toLowerCase();
+  const away = (f.away || "").toLowerCase();
+  const hc = (f.homeCode || "").toLowerCase();
+  const ac = (f.awayCode || "").toLowerCase();
+  const match = (f.match || "").toLowerCase();
+  let score = 0;
 
-  // Prefer World Cup pack (judge-facing WC data).
-  const wcHit = wcBoardFixtures().find(
-    (f) =>
-      f.match.toLowerCase().includes(q) ||
-      (f.home && q.includes(f.home.toLowerCase())) ||
-      (f.away && q.includes(f.away.toLowerCase())) ||
-      f.stage.toLowerCase().includes(q)
+  if (match && q.includes(match)) score += 10;
+  if (hc && q.includes(hc)) score += 4;
+  if (ac && q.includes(ac)) score += 4;
+  if (home && q.includes(home)) score += 3;
+  if (away && q.includes(away)) score += 3;
+
+  const hasHome = (hc && q.includes(hc)) || (home && q.includes(home));
+  const hasAway = (ac && q.includes(ac)) || (away && q.includes(away));
+  if (hasHome && hasAway) score += 8;
+
+  if (f.stage && q.includes(String(f.stage).toLowerCase())) score += 1;
+  return score;
+}
+
+function formatWcIntel(wcHit) {
+  return (
+    `WC2026: ${wcHit.home || wcHit.homeCode} vs ${wcHit.away || wcHit.awayCode}\n` +
+    `Codes: ${wcHit.match}\n` +
+    `Stage: ${wcHit.stage}\n` +
+    `Date: ${wcHit.date}\n` +
+    `Status: ${wcHit.score}\n` +
+    (wcHit.venue ? `Venue: ${wcHit.venue}\n` : "") +
+    (wcHit.note ? `Note: ${wcHit.note}\n` : "") +
+    `Tip: Pay x402 for a deeper graded unlock.\n` +
+    `Source: Striker OS World Cup pack`
   );
-  if (wcHit) {
-    return (
-      `WC2026: ${wcHit.match}\n` +
-      `Stage: ${wcHit.stage}\n` +
-      `Date: ${wcHit.date}\n` +
-      `Status: ${wcHit.score}\n` +
-      (wcHit.venue ? `Venue: ${wcHit.venue}\n` : "") +
-      (wcHit.note ? `Note: ${wcHit.note}\n` : "") +
-      `Source: Striker OS World Cup pack`
-    );
+}
+
+async function liveMatchIntel(prompt) {
+  const fixtures = wcBoardFixtures();
+  let best = null;
+  let bestScore = 0;
+  fixtures.forEach((f) => {
+    const s = scoreFixtureAgainstQuery(f, prompt);
+    if (s > bestScore) {
+      bestScore = s;
+      best = f;
+    }
+  });
+  // Need at least one team code/name hit (not random stage-only noise)
+  if (best && bestScore >= 4) {
+    return formatWcIntel(best);
   }
 
   try {
-    const fixtures = await fetchLiveFixtures(30);
-    const hit = fixtures.find(
+    const live = await fetchLiveFixtures(30);
+    const q = prompt.toLowerCase();
+    const hit = live.find(
       (f) =>
-        f.match
-          .toLowerCase()
-          .split(" vs ")
-          .some((team) => q.includes(team.toLowerCase())) ||
-        q.includes(f.match.toLowerCase())
+        q.includes((f.match || "").toLowerCase()) ||
+        (f.home && q.includes(f.home.toLowerCase())) ||
+        (f.away && q.includes(f.away.toLowerCase())) ||
+        scoreFixtureAgainstQuery(f, prompt) >= 4
     );
     if (hit) {
       return `LIVE SOCCER API: ${hit.match}\nStage: ${hit.stage}\nDate: ${hit.date}\nStatus: ${
@@ -507,7 +539,15 @@ function paintFixtures(fixtures, mode) {
       <button class="btn btn-primary" type="button">Analyze</button>
     `;
     card.querySelector("button").addEventListener("click", () => {
-      ui.oracleInput.value = `Give a short match intel summary for ${fixture.match}.`;
+      const label = `${fixture.home || fixture.homeCode} vs ${
+        fixture.away || fixture.awayCode
+      }`;
+      ui.oracleInput.value = `Match intel: ${label} (${fixture.match})`;
+      sfx("click");
+      document.getElementById("oracle")?.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
       runOracle();
     });
     ui.fixtureList.appendChild(card);
