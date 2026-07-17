@@ -48,6 +48,11 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+::selection {
+  background: rgba(247, 213, 29, 0.35);
+  color: #fff;
+}
+
 a {
   color: inherit;
   text-decoration: none;
@@ -109,6 +114,11 @@ h3 {
   border: 3px solid var(--line-strong);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.panel:hover {
+  border-color: #4a5ab0;
 }
 
 .panel-pad {
@@ -329,6 +339,10 @@ header.top {
 .wallet-bar .btn {
   padding: 0.5rem 0.75rem;
   font-size: 0.55rem;
+}
+
+#btn-mute {
+  min-width: 4.6rem;
 }
 
 /* ---------- Hero ---------- */
@@ -713,10 +727,10 @@ header.top {
 /* ---------- Arena ---------- */
 .arena-wrap {
   position: relative;
-  height: 280px;
+  height: 300px;
   overflow: hidden;
   border: 3px solid var(--line-strong);
-  background: #0b1030;
+  background: #14301a;
   box-shadow: var(--shadow-sm);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
@@ -869,6 +883,12 @@ header.top {
   justify-content: space-between;
   align-items: center;
   gap: 0.65rem;
+  transition: border-color 140ms ease, transform 140ms ease;
+}
+
+.fixture-card:hover {
+  border-color: var(--gold);
+  transform: translate(-1px, -1px);
 }
 
 .fixture-main {

@@ -99,6 +99,14 @@ function apiUrl(path) {
   return `${API_ENDPOINT}${path}`;
 }
 
+function sfx(name) {
+  try {
+    window.StrikerSfx?.[name]?.();
+  } catch (_) {
+    /* ignore */
+  }
+}
+
 function log(message, tone = "info") {
   const line = document.createElement("p");
   line.className = `log-line log-${tone}`;
@@ -138,6 +146,7 @@ async function connectWallet() {
       ui.walletConnect.classList.remove("btn-primary", "btn-ghost");
       ui.walletConnect.classList.add("btn-status");
       log(`Connected Keplr ${state.operator}`, "success");
+      sfx("success");
       addXp(20);
       updateStats();
       return;
@@ -158,6 +167,7 @@ async function connectWallet() {
 }
 
 function toggleTech(tech) {
+  sfx("tab");
   ui.techCards.forEach((card) => {
     card.classList.toggle("active", card.dataset.tech === tech);
   });
@@ -185,6 +195,7 @@ async function proveX402() {
         } on ${body.accepts?.[0]?.network || "eip155:1439"}`,
         "success"
       );
+      sfx("success");
     } else {
       log(`Unexpected status ${res.status} (expected 402 without payment).`, "warn");
     }
@@ -197,11 +208,13 @@ async function proveX402() {
 async function payX402() {
   if (state.usdc < 0.01) {
     log("Insufficient USDC. Run the CCTP fund path first.", "warn");
+    sfx("warn");
     return;
   }
   const query = (ui.oracleInput.value || "spain").slice(0, 40);
   const url = apiUrl(`/api/match-intel?match=${encodeURIComponent(query)}`);
   log(`x402: GET ${url}`, "info");
+  sfx("pay");
   try {
     const first = await fetch(url);
     if (first.status === 402) {
@@ -228,6 +241,7 @@ async function payX402() {
         response: data
       });
       log("x402: receipt accepted · match intel unlocked.", "success");
+      sfx("success");
       addXp(10);
       updateStats();
       return;
@@ -261,6 +275,7 @@ function runCctpFund() {
   state.usdc += 50;
   setProof(ui.cctpProof, receipt);
   log("CCTP fund path: +50 USDC credited to operator desk.", "success");
+  sfx("success");
   addXp(8);
   updateStats();
 }
@@ -347,6 +362,7 @@ function runSkill(skill) {
     workflow: pack.note
   });
   log(`Agent skill ready: ${pack.label}`, "success");
+  sfx("click");
   if (skill === "sentiment") state.accuracy = Math.min(95, state.accuracy + 4);
   if (skill === "prediction") addXp(6);
   if (skill === "cctpSkill" || skill === "mcpSkill") addXp(4);
@@ -630,6 +646,7 @@ const arena = (() => {
       messageColor = "#92cc41";
       flash = 1;
       spawnConfetti(ball.x, ball.y);
+      sfx("goal");
       if (arenaWrap) {
         arenaWrap.classList.add("arena-goal-burst");
         setTimeout(() => arenaWrap.classList.remove("arena-goal-burst"), 700);
@@ -647,6 +664,7 @@ const arena = (() => {
       message = "BLOCKED";
       messageColor = "#e76e55";
       keeperDive = 18;
+      sfx("blocked");
       log("Goal Battle: blocked by keeper.", "warn");
       setTimeout(reset, 1400);
       return;
@@ -654,6 +672,7 @@ const arena = (() => {
 
     message = "MISS";
     messageColor = "#9aa6d6";
+    sfx("miss");
     log("Goal Battle: miss — reset and try again.", "info");
     setTimeout(reset, 1400);
   }
@@ -1016,6 +1035,7 @@ const arena = (() => {
     flightMs = 0;
     message = "";
     setLocked(true);
+    sfx("kick");
     log(`Kick fired (${power} power, ${angle}°).`, "info");
   }
 
@@ -1107,6 +1127,34 @@ ui.walletConnect.addEventListener("click", connectWallet);
 ui.techCards.forEach((card) =>
   card.addEventListener("click", () => toggleTech(card.dataset.tech))
 );
+
+const muteBtn = document.getElementById("btn-mute");
+function syncMuteUi() {
+  if (!muteBtn || !window.StrikerSfx) return;
+  const on = !window.StrikerSfx.isMuted();
+  muteBtn.textContent = on ? "SFX On" : "SFX Off";
+  muteBtn.setAttribute("aria-pressed", on ? "false" : "true");
+  muteBtn.classList.toggle("btn-status", !on);
+}
+if (muteBtn) {
+  syncMuteUi();
+  muteBtn.addEventListener("click", () => {
+    window.StrikerSfx?.unlock?.();
+    window.StrikerSfx?.toggle?.();
+    syncMuteUi();
+    if (!window.StrikerSfx?.isMuted()) sfx("click");
+  });
+}
+// Unlock audio on first user gesture anywhere
+["pointerdown", "keydown"].forEach((ev) => {
+  window.addEventListener(
+    ev,
+    () => {
+      window.StrikerSfx?.unlock?.();
+    },
+    { once: true, passive: true }
+  );
+});
 
 document.getElementById("btn-x402").addEventListener("click", payX402);
 const proveBtn = document.getElementById("btn-x402-prove");

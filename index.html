@@ -17,6 +17,7 @@
   <link rel="apple-touch-icon" href="https://striker-os.vercel.app/assets/favicon.svg" />
   <link rel="preconnect" href="https://flagcdn.com" crossorigin />
   <link rel="dns-prefetch" href="https://flagcdn.com" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Work+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/app.css" />
@@ -40,6 +41,7 @@
       </nav>
 
       <div class="wallet-bar">
+        <button class="btn btn-ghost" type="button" id="btn-mute" aria-pressed="false" title="Toggle sound">SFX On</button>
         <span class="chip chip-live"><span class="chip-dot" aria-hidden="true"></span> injective-1</span>
         <span class="balance" id="wallet-balance">25.00 USDC</span>
         <button class="btn btn-primary" type="button" id="wallet-connect">Connect</button>
@@ -270,6 +272,7 @@
 
   <script src="data/worldcup-2026.js"></script>
   <script src="js/flags.js"></script>
+  <script src="js/sfx.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>
