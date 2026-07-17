@@ -758,10 +758,11 @@ header.top {
 
 .controls {
   display: grid;
-  grid-template-columns: 1.15fr 1fr;
+  grid-template-columns: 1fr;
   gap: 0.9rem;
   margin-top: 0.9rem;
   align-items: end;
+  max-width: 360px;
 }
 
 .slider-block label {

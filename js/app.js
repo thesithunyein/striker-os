@@ -748,29 +748,54 @@ const arena = (() => {
     ctx.fillRect(Math.round(x), Math.round(y), w, h);
   }
 
-  /** Pixel striker (brand smiley) standing behind the ball when idle. */
+  /** Shooter stays at kick spot — never follows the ball. */
   function drawShooter() {
-    if (ball.fired && !resolved) return;
-    const sx = ball.x - 28;
-    const sy = ball.y - 6;
-    // Body
-    px(sx + 4, sy + 10, 10, 12, "#209cee");
+    const sx = ballStart.x - 30;
+    const sy = ballStart.y - 8;
+    const plant = ball.fired; // follow-through pose after kick
+
+    // Ground shadow
+    px(sx + 2, sy + 30, 18, 3, "rgba(0,0,0,0.4)");
+
     // Legs
-    px(sx + 4, sy + 22, 3, 8, "#151b42");
-    px(sx + 11, sy + 22, 3, 8, "#151b42");
+    if (plant) {
+      px(sx + 5, sy + 20, 4, 10, "#1a2744");
+      px(sx + 12, sy + 18, 4, 12, "#1a2744"); // plant leg forward
+      px(sx + 4, sy + 28, 5, 3, "#0a0e27");
+      px(sx + 13, sy + 28, 5, 3, "#0a0e27");
+    } else {
+      px(sx + 6, sy + 20, 4, 10, "#1a2744");
+      px(sx + 12, sy + 20, 4, 10, "#1a2744");
+      px(sx + 5, sy + 28, 5, 3, "#0a0e27");
+      px(sx + 12, sy + 28, 5, 3, "#0a0e27");
+    }
+
+    // Torso (blue kit)
+    px(sx + 5, sy + 8, 12, 13, "#209cee");
+    px(sx + 7, sy + 10, 8, 2, "#9ad4ff"); // collar line
+
     // Arms
-    px(sx + 1, sy + 12, 3, 8, "#f0c8a0");
-    px(sx + 14, sy + 12, 3, 8, "#f0c8a0");
+    if (plant) {
+      px(sx + 1, sy + 10, 4, 9, "#e8b890"); // swing back
+      px(sx + 17, sy + 8, 4, 10, "#e8b890"); // follow through
+    } else {
+      px(sx + 2, sy + 10, 4, 9, "#e8b890");
+      px(sx + 16, sy + 10, 4, 9, "#e8b890");
+    }
+
+    // Neck
+    px(sx + 9, sy + 5, 4, 4, "#e8b890");
+
     // Head — Striker OS gold logo face
-    px(sx + 3, sy, 12, 11, "#f7d51d");
-    px(sx + 5, sy + 3, 2, 2, "#151b42");
-    px(sx + 10, sy + 3, 2, 2, "#151b42");
-    px(sx + 5, sy + 7, 6, 1, "#151b42");
-    px(sx + 4, sy + 6, 1, 1, "#151b42");
-    px(sx + 11, sy + 6, 1, 1, "#151b42");
+    px(sx + 5, sy - 6, 12, 12, "#f7d51d");
+    px(sx + 7, sy - 3, 2, 2, "#151b42");
+    px(sx + 12, sy - 3, 2, 2, "#151b42");
+    px(sx + 7, sy + 2, 6, 1, "#151b42");
+    px(sx + 6, sy + 1, 1, 1, "#151b42");
+    px(sx + 13, sy + 1, 1, 1, "#151b42");
   }
 
-  /** Pixel goalkeeper person (gloves + jersey), not a red bar. */
+  /** Pixel goalkeeper — stays on the line; dive pose on block. */
   function drawGoalie() {
     if (!resolved) {
       goalie.y += goalie.speed * goalie.dir;
@@ -782,35 +807,41 @@ const arena = (() => {
 
     const cx = goalie.x + goalie.w / 2;
     const cy = goalie.y;
-    const dive = keeperDive > 0 ? -4 : 0;
+    const diving = keeperDive > 0;
 
     // Shadow
-    px(cx - 8, cy + 22, 16, 3, "rgba(0,0,0,0.35)");
+    px(cx - 9, cy + 22, 18, 3, "rgba(0,0,0,0.4)");
 
-    // Legs
-    px(cx - 6, cy + 10, 4, 12, "#1b2350");
-    px(cx + 2, cy + 10, 4, 12, "#1b2350");
-    // Boots
+    if (diving) {
+      // Dive stretch toward ball side
+      px(cx - 4, cy + 8, 10, 6, "#1a2744"); // legs tucked
+      px(cx - 10, cy - 2, 20, 12, "#e76e55"); // torso horizontal-ish
+      px(cx - 16, cy - 4, 6, 6, "#f4f6ff"); // glove
+      px(cx + 10, cy - 4, 6, 6, "#f4f6ff");
+      px(cx - 5, cy - 14, 10, 10, "#e8b890"); // head
+      px(cx - 3, cy - 11, 2, 2, "#151b42");
+      px(cx + 1, cy - 11, 2, 2, "#151b42");
+      px(cx - 5, cy - 16, 10, 3, "#151b42"); // hair
+      return;
+    }
+
+    // Standing keeper
+    px(cx - 6, cy + 10, 4, 12, "#1a2744");
+    px(cx + 2, cy + 10, 4, 12, "#1a2744");
     px(cx - 7, cy + 20, 5, 3, "#0a0e27");
     px(cx + 2, cy + 20, 5, 3, "#0a0e27");
 
-    // Torso (keeper jersey — red)
     px(cx - 7, cy - 6, 14, 16, "#e76e55");
-    px(cx - 2, cy - 2, 4, 8, "#fff2a8"); // kit stripe
+    px(cx - 2, cy - 2, 4, 9, "#fff2a8");
 
-    // Arms + gloves stretch toward ball when diving
-    const armY = cy - 2 + dive;
-    px(cx - 12, armY, 5, 5, "#e76e55");
-    px(cx + 7, armY, 5, 5, "#e76e55");
-    px(cx - 14, armY - 1, 5, 5, "#f4f6ff"); // left glove
-    px(cx + 9, armY - 1, 5, 5, "#f4f6ff"); // right glove
+    px(cx - 12, cy - 2, 5, 8, "#e76e55");
+    px(cx + 7, cy - 2, 5, 8, "#e76e55");
+    px(cx - 14, cy - 3, 5, 5, "#f4f6ff");
+    px(cx + 9, cy - 3, 5, 5, "#f4f6ff");
 
-    // Head
-    px(cx - 5, cy - 18, 10, 10, "#f0c8a0");
-    // Eyes
+    px(cx - 5, cy - 18, 10, 10, "#e8b890");
     px(cx - 3, cy - 15, 2, 2, "#151b42");
     px(cx + 1, cy - 15, 2, 2, "#151b42");
-    // Cap / hair
     px(cx - 5, cy - 20, 10, 3, "#151b42");
   }
 
@@ -822,8 +853,7 @@ const arena = (() => {
     ctx.strokeStyle = "#2a2300";
     ctx.lineWidth = 1.5;
     ctx.stroke();
-    // Ball pentagon hint
-    ctx.strokeStyle = "rgba(42,35,0,0.5)";
+    ctx.strokeStyle = "rgba(42,35,0,0.45)";
     ctx.beginPath();
     ctx.arc(ball.x - 2, ball.y - 1, 3, 0, Math.PI * 2);
     ctx.stroke();
