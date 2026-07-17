@@ -11,7 +11,11 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
+import { createRequire } from "module";
 import { getFixtures, getMatch, getTeams } from "./worldcup.js";
+
+const require = createRequire(import.meta.url);
+const StrikerModel = require("../lib/striker-model.js");
 
 const server = new McpServer({
   name: "striker-os-worldcup",
@@ -57,6 +61,25 @@ server.tool(
     const teams = await getTeams(league || "English Premier League");
     return {
       content: [{ type: "text", text: JSON.stringify(teams, null, 2) }]
+    };
+  }
+);
+
+server.tool(
+  "worldcup_predict",
+  "Run the Striker Model (Elo win-probability + Poisson expected goals) for a matchup. Query like 'Spain vs Argentina' or pass two FIFA codes.",
+  { query: z.string() },
+  async ({ query }) => {
+    const signal = StrikerModel.analyzeQuery(query);
+    return {
+      content: [
+        {
+          type: "text",
+          text: signal
+            ? JSON.stringify(signal, null, 2)
+            : `No rated matchup found in "${query}". Use two known nations, e.g. "Spain vs Argentina".`
+        }
+      ]
     };
   }
 );

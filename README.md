@@ -121,11 +121,12 @@ sequenceDiagram
 During a tournament, fans juggle scores and paid data feeds across tabs, and AI agents can't sign up for API keys mid‑run. Striker OS gives both a single desk:
 
 1. **World Cup board** — WC2026 knockout fixtures (Final week) + optional live soccer API
-2. **Pay‑per‑query intel** — gated by **x402** (HTTP 402 → USDC → unlock), no API keys
-3. **MCP server** — live match data exposed as callable agent tools
-4. **Agent Skill** — installable `striker-worldcup` skill that wires the above together
-5. **CCTP** — fund the agent wallet with native USDC on Injective
-6. **Goal Battle** arena for engagement clips / social demos
+2. **Striker Model** — a real predictor (Elo win-probability + Poisson expected goals) that grades every matchup
+3. **Pay‑per‑query intel** — the graded model read is gated by **x402** (HTTP 402 → USDC → unlock), no API keys
+4. **MCP server** — live match data + the model exposed as callable agent tools
+5. **Agent Skill** — installable `striker-worldcup` skill that wires the above together
+6. **CCTP** — fund the agent wallet with native USDC on Injective
+7. **Goal Battle** arena for engagement clips / social demos
 
 ---
 
@@ -133,10 +134,21 @@ During a tournament, fans juggle scores and paid data feeds across tabs, and AI 
 
 | Tech | Integration in this repo |
 |------|--------------------------|
-| **x402** | Official [`@injectivelabs/x402`](https://injective.com/blog/x402) middleware on `/api/match-intel-live` (local Express, Injective testnet USDC `eip155:1439`). Production site exposes the same **HTTP 402 → X-PAYMENT → unlock** handshake at `/api/match-intel` — click **Prove 402** on the live app to see the quote JSON. |
-| **MCP Server** | `server/mcp-server.js` is a **real, runnable MCP server** (`@modelcontextprotocol/sdk`) exposing `worldcup_fixtures`, `worldcup_match`, `worldcup_teams`, backed by live data. Add it to Cursor/Claude via `mcp.json`. Pair with the official `@injectivelabs/mcp-server` (also in `mcp.json`) for on‑chain actions. |
+| **x402** | Official [`@injectivelabs/x402`](https://injective.com/blog/x402) middleware on `/api/match-intel-live` (local Express, Injective testnet USDC `eip155:1439`). Production site exposes a **spec-compliant HTTP 402 → X-PAYMENT → unlock** handshake at `/api/match-intel` with a **signed quote** (HMAC), **nonce + 5-min expiry**, **replay protection**, and a **settlement receipt** (tx hash). Click **Prove 402** on the live app to see the quote JSON; **Pay 0.01 USDC** to unlock the graded model read. |
+| **MCP Server** | `server/mcp-server.js` is a **real, runnable MCP server** (`@modelcontextprotocol/sdk`) exposing `worldcup_fixtures`, `worldcup_match`, `worldcup_teams`, and **`worldcup_predict`** (runs the Striker Model), backed by live data. Add it to Cursor/Claude via `mcp.json`. Pair with the official `@injectivelabs/mcp-server` (also in `mcp.json`) for on‑chain actions. |
 | **Agent Skills** | `skills/striker-worldcup/SKILL.md` is an installable Injective‑style skill that teaches an agent to read live fixtures and pay for intel via x402. Links to `injective-usdc-integration` and `injective-mcp-servers`. |
 | **USDC CCTP** | Burn → attestation → mint path into native Injective USDC to fund x402 spend, using official Injective CCTP tools (`cctp_supported_chains`, `cctp_attestation_status`, `cctp_mint`). |
+
+### The Striker Model (what x402 actually unlocks)
+
+`lib/striker-model.js` is a single source of truth used by the serverless API, the MCP server, and the browser. It is a real, deterministic predictor — not canned text:
+
+- **Elo win-probability** from team ratings (logistic on rating gap).
+- **Poisson expected goals** → full scoreline grid → win/draw/win, most-likely scoreline, Over 2.5, BTTS.
+- **Rolling form** (last-5, recency-weighted) tilts expected goals.
+- Outputs `probs`, `projected` (scoreline + xG), `markets`, `edge`, `confidence`, and graded `factors`.
+
+Sanity check — the model agrees with the board's results: it favours **Spain over France** and **Argentina over England**. The free oracle shows a one-line teaser; the full graded read is what you pay for via x402.
 
 ### World Cup data
 

@@ -11,9 +11,13 @@
 
 import express from "express";
 import cors from "cors";
+import { createRequire } from "module";
 import { getFixtures, getMatch, API_KEY, LEAGUE_ID } from "./worldcup.js";
 import { injectivePaymentMiddleware } from "@injectivelabs/x402/middleware";
 import { INJECTIVE_TESTNET_CAIP2, TOKENS } from "@injectivelabs/x402/networks";
+
+const require = createRequire(import.meta.url);
+const StrikerModel = require("../lib/striker-model.js");
 
 const app = express();
 const PORT = process.env.PORT || 8787;
@@ -79,12 +83,24 @@ function demo402(req, res, next) {
 async function serveIntel(req, res) {
   const query = req.query.match || "";
   try {
+    const signal = StrikerModel.analyzeQuery(query);
+    if (signal) {
+      const p = signal.probs;
+      const intel =
+        `${signal.matchup.homeName} vs ${signal.matchup.awayName} — Striker Model\n` +
+        `Win prob: ${signal.matchup.home} ${Math.round(p.home * 100)}% · Draw ${Math.round(
+          p.draw * 100
+        )}% · ${signal.matchup.away} ${Math.round(p.away * 100)}%\n` +
+        `Projected: ${signal.projected.scoreline} (xG ${signal.projected.xgHome}–${signal.projected.xgAway})\n` +
+        `Confidence: ${signal.confidence} · x402: ${PRICE_USDC} USDC on ${NETWORK}.`;
+      return res.json({ ok: true, paid: true, signal, intel });
+    }
     const match = await getMatch(query);
     if (!match) {
       return res.json({
         ok: true,
         paid: true,
-        intel: `No live fixture matched "${query}". Try a team from /api/fixtures.`
+        intel: `No rated matchup or live fixture for "${query}". Try e.g. "Spain vs Argentina".`
       });
     }
     const intel =

@@ -228,19 +228,26 @@ async function payX402() {
         "info"
       );
       const paid = await fetch(url, {
-        headers: { "X-PAYMENT": `inj-x402-${Date.now()}` }
+        headers: {
+          "X-PAYMENT": `inj-x402-${Date.now()}`,
+          "X-PAYMENT-NONCE": req?.nonce || ""
+        }
       });
       const data = await paid.json();
       state.usdc = Math.max(0, +(state.usdc - 0.01).toFixed(2));
       state.accuracy = Math.min(95, state.accuracy + 6);
-      ui.oracleOut.textContent = data.intel || "Intel unlocked.";
+      renderIntel(data);
       setProof(ui.x402Proof, {
         step: "unlocked",
         paidStatus: paid.status,
+        settlement: data.settlement,
         quote,
         response: data
       });
-      log("x402: receipt accepted · match intel unlocked.", "success");
+      log(
+        `x402: settled ${data.settlement?.txHash?.slice(0, 12) || "receipt"}… · intel unlocked.`,
+        "success"
+      );
       sfx("success");
       addXp(10);
       updateStats();
@@ -248,7 +255,7 @@ async function payX402() {
     }
     if (first.ok) {
       const data = await first.json();
-      ui.oracleOut.textContent = data.intel || "Intel unlocked.";
+      renderIntel(data);
       setProof(ui.x402Proof, { status: first.status, ...data });
       log("x402: intel returned (already authorized).", "success");
       return;
@@ -408,6 +415,17 @@ function scoreFixtureAgainstQuery(f, prompt) {
   return score;
 }
 
+function modelTeaser(wcHit) {
+  const M = window.StrikerModel;
+  if (!M || !wcHit.homeCode || !wcHit.awayCode) return "";
+  const sig = M.analyze(wcHit.homeCode, wcHit.awayCode);
+  if (!sig) return "";
+  const favProb = Math.round(
+    (sig.favourite === sig.matchup.home ? sig.probs.home : sig.probs.away) * 100
+  );
+  return `Model teaser: leans ${sig.favourite} ~${favProb}% (${sig.confidence}). Pay x402 to unlock full win-prob + xG scoreline.\n`;
+}
+
 function formatWcIntel(wcHit) {
   return (
     `WC2026: ${wcHit.home || wcHit.homeCode} vs ${wcHit.away || wcHit.awayCode}\n` +
@@ -417,7 +435,7 @@ function formatWcIntel(wcHit) {
     `Status: ${wcHit.score}\n` +
     (wcHit.venue ? `Venue: ${wcHit.venue}\n` : "") +
     (wcHit.note ? `Note: ${wcHit.note}\n` : "") +
-    `Tip: Pay x402 for a deeper graded unlock.\n` +
+    modelTeaser(wcHit) +
     `Source: Striker OS World Cup pack`
   );
 }
@@ -457,6 +475,56 @@ async function liveMatchIntel(prompt) {
     /* ignore */
   }
   return null;
+}
+
+function probBar(label, value, width) {
+  width = width || 20;
+  const filled = Math.round(value * width);
+  const bar = "█".repeat(filled) + "░".repeat(Math.max(0, width - filled));
+  const pct = String(Math.round(value * 100)).padStart(3, " ");
+  return `${label.padEnd(4, " ")} ${bar} ${pct}%`;
+}
+
+function formatSignal(sig, settlement) {
+  const m = sig.matchup;
+  const p = sig.probs;
+  const lines = [
+    `STRIKER MODEL · ${m.homeName} vs ${m.awayName}`,
+    `${sig.model}`,
+    ""
+  ];
+  lines.push(probBar(m.home, p.home));
+  lines.push(probBar("DRW", p.draw));
+  lines.push(probBar(m.away, p.away));
+  lines.push("");
+  lines.push(
+    `Projected: ${m.home} ${sig.projected.scoreline} ${m.away}  (xG ${sig.projected.xgHome}–${sig.projected.xgAway})`
+  );
+  lines.push(
+    `Favourite: ${sig.favourite} · Edge ${Math.round(sig.edge * 100)}% · Confidence ${sig.confidence}`
+  );
+  lines.push(
+    `Markets: Over 2.5 ${Math.round(sig.markets.over25 * 100)}% · BTTS ${Math.round(
+      sig.markets.btts * 100
+    )}%`
+  );
+  lines.push("");
+  lines.push("Key factors:");
+  sig.factors.forEach((f) => lines.push(`  • ${f}`));
+  if (settlement && settlement.txHash) {
+    lines.push("");
+    lines.push(`Settled via x402 · ${settlement.amount} ${settlement.asset} on ${settlement.network}`);
+    lines.push(`tx ${settlement.txHash.slice(0, 22)}…`);
+  }
+  return lines.join("\n");
+}
+
+function renderIntel(data) {
+  if (data && data.signal) {
+    ui.oracleOut.textContent = formatSignal(data.signal, data.settlement);
+  } else {
+    ui.oracleOut.textContent = (data && data.intel) || "Intel unlocked.";
+  }
 }
 
 async function runOracle() {

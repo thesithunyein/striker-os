@@ -37,7 +37,12 @@ Call the MCP tools exposed by `server/mcp-server.js`:
 worldcup_fixtures { "limit": 6 }
 worldcup_match    { "query": "Brazil" }
 worldcup_teams    { "league": "English Premier League" }
+worldcup_predict  { "query": "Spain vs Argentina" }
 ```
+
+`worldcup_predict` runs the **Striker Model** (Elo win-probability + Poisson
+expected goals) and returns win/draw/win probabilities, the most-likely
+scoreline, Over 2.5 / BTTS markets, edge, confidence, and graded key factors.
 
 Or hit the free HTTP endpoint:
 
@@ -48,15 +53,19 @@ curl http://localhost:8787/api/fixtures
 ### 2. Pay for deep intel (x402)
 
 The `/api/match-intel` route is protected by Injective x402. A client without a
-payment receipt gets an HTTP `402` with a USDC quote; after paying via the
-facilitator it retries with an `X-PAYMENT` receipt and receives the intel.
+payment receipt gets an HTTP `402` with a **signed USDC quote** (HMAC signature,
+nonce, 5-min expiry). After paying via the facilitator it retries with an
+`X-PAYMENT` receipt and the matching `X-PAYMENT-NONCE`, and receives the full
+**Striker Model** read plus a settlement receipt (tx hash). Reusing a nonce is
+rejected as a replay.
 
 ```bash
-# First call returns 402 + payment requirements (USDC on Injective)
-curl -i "http://localhost:8787/api/match-intel?match=Brazil"
+# First call returns 402 + signed payment requirements (USDC on Injective)
+curl -i "http://localhost:8787/api/match-intel?match=Spain%20vs%20Argentina"
 
-# After settling via the Injective x402 facilitator, retry with the receipt
-curl -H "X-PAYMENT: <receipt>" "http://localhost:8787/api/match-intel?match=Brazil"
+# After settling via the Injective x402 facilitator, retry with the receipt + nonce
+curl -H "X-PAYMENT: <receipt>" -H "X-PAYMENT-NONCE: <nonce>" \
+  "http://localhost:8787/api/match-intel?match=Spain%20vs%20Argentina"
 ```
 
 Production wiring uses [`@injectivelabs/x402`](https://injective.com/blog/x402)
