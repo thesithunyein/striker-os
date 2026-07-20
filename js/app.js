@@ -391,7 +391,17 @@ function answerFromPack(prompt) {
 }
 
 function wcBoardFixtures() {
+  if (typeof window.getWc2026Fixtures === "function") {
+    return window.getWc2026Fixtures();
+  }
   return window.WC2026_FIXTURES || [];
+}
+
+function refreshWcBoardChrome() {
+  const sub = document.getElementById("fixtures-sub");
+  if (sub && typeof window.getWc2026BoardSubtitle === "function") {
+    sub.textContent = window.getWc2026BoardSubtitle();
+  }
 }
 
 /** Match Analyze queries like "… FRA vs ESP" and names like "France". */
@@ -653,8 +663,9 @@ function renderHostsRow() {
 }
 
 async function showWcBoard() {
+  refreshWcBoardChrome();
   paintFixtures(wcBoardFixtures(), "wc");
-  log("World Cup 2026 knockout board loaded.", "success");
+  log("World Cup 2026 knockout board loaded (date-aware).", "success");
 }
 
 async function showLiveBoard() {

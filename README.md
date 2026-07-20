@@ -152,7 +152,7 @@ Sanity check — the model agrees with the board's results: it favours **Spain o
 
 ### World Cup data
 
-Primary board = **FIFA World Cup 2026 knockout pack** (`data/worldcup-2026.js`) for Final-week context and screenshots. Each fixture shows **real country flags** (PNG via [flagcdn.com](https://flagcdn.com) — works in all major browsers). Toggle **Live soccer API** (TheSportsDB) beside it. MCP tools (`worldcup_fixtures`, etc.) use the live sports module. Badge shows **WC2026** or **LIVE API**.
+Primary board = **FIFA World Cup 2026 knockout pack** (`data/worldcup-2026.js`) — **date-aware**: fixtures flip from Upcoming → FT on match day using the visitor's calendar, so judges always see a live board. Each fixture shows **real country flags** (PNG via [flagcdn.com](https://flagcdn.com)). Toggle **Live soccer API** (TheSportsDB club badges) beside it. MCP tools (`worldcup_fixtures`, etc.) use the live sports module. Badge shows **WC2026** or **LIVE API**.
 
 ---
 
