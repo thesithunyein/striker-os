@@ -1,13 +1,13 @@
 /**
  * FIFA World Cup 2026 — knockout snapshot for Striker OS.
- * Primary board data for judges / screenshots (Final week context).
+ * Primary board data for judges / screenshots (post-Final, updated 20 July 2026).
  * Hosts: Canada, Mexico, USA · Final: 19 July 2026 (MetLife / NY-NJ area)
  */
 window.WC2026 = {
   tournament: "FIFA World Cup 2026",
   hosts: ["Canada", "Mexico", "United States"],
-  stage: "Knockout — Semi-finals / Final week",
-  updated: "2026-07-17",
+  stage: "Knockout — Champions crowned",
+  updated: "2026-07-20",
   fixtures: [
     {
       id: "sf1",
@@ -44,9 +44,9 @@ window.WC2026 = {
       homeCode: "FRA",
       awayCode: "ENG",
       venue: "Miami Stadium",
-      score: null,
-      status: "Upcoming",
-      note: "Bronze final"
+      score: "2–1",
+      status: "FT",
+      note: "France take bronze (Mbappe 34, Dembele 71; Kane 58)"
     },
     {
       id: "final",
@@ -57,9 +57,9 @@ window.WC2026 = {
       homeCode: "ESP",
       awayCode: "ARG",
       venue: "New York / New Jersey (MetLife area)",
-      score: null,
-      status: "Upcoming",
-      note: "World Cup Final · 19 July 2026"
+      score: "2–1",
+      status: "FT",
+      note: "Spain are World Cup champions (Yamal 22, Olmo 67; Messi 81)"
     }
   ],
   knowledge: {
@@ -91,22 +91,22 @@ window.WC2026_KNOWLEDGE = [
   {
     keywords: ["final", "champion", "winner", "spain", "argentina", "esp", "arg"],
     answer:
-      "WC2026 Final: Spain vs Argentina · 19 July 2026 · MetLife area (NY/NJ). Spain beat France 2–0 in the SF; Argentina beat England 2–1 (late comeback). Striker OS gates deeper win-probability reads behind x402."
+      "WC2026 champions: Spain beat Argentina 2–1 in the Final (19 July, MetLife / NY-NJ). Yamal 22, Olmo 67; Messi 81. Spain also beat France 2–0 in the SF; Argentina beat England 2–1. Striker OS gates deeper graded reads behind x402."
   },
   {
     keywords: ["england", "semi", "eng"],
     answer:
-      "Semi-final 2 (15 July, Atlanta): England 1–2 Argentina. Gordon 55; Fernandez 85, Martinez 90+2. England play France in the third-place match (18 July, Miami)."
+      "Semi-final 2 (15 July, Atlanta): England 1–2 Argentina. Third-place (18 July, Miami): France 2–1 England — France take bronze."
   },
   {
     keywords: ["france", "third", "bronze", "fra"],
     answer:
-      "Third-place: France vs England · 18 July 2026 · Miami. France lost the SF to Spain 0–2; England lost the SF to Argentina 1–2."
+      "Third-place FT (18 July, Miami): France 2–1 England. Mbappe 34, Dembele 71; Kane 58. France take bronze; England finish fourth."
   },
   {
     keywords: ["fra vs esp", "france vs spain", "esp vs fra"],
     answer:
-      "Semi-final 1 (14 July, Dallas): France 0–2 Spain. Spain advanced to the Final vs Argentina."
+      "Semi-final 1 (14 July, Dallas): France 0–2 Spain. Spain went on to win the Final 2–1 vs Argentina."
   },
   {
     keywords: ["inj", "injective", "x402"],
@@ -121,6 +121,6 @@ window.WC2026_KNOWLEDGE = [
   {
     keywords: ["fixtures", "schedule", "knockout", "world cup"],
     answer:
-      "WC2026 knockout board is loaded from the Striker OS World Cup pack. Live soccer API + MCP tools (worldcup_fixtures) sit beside it for agent workflows."
+      "WC2026 knockout board is loaded from the Striker OS World Cup pack (updated post-Final). Live soccer API + MCP tools (worldcup_fixtures) sit beside it for agent workflows."
   }
 ];
