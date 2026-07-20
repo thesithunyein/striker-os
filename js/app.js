@@ -35,8 +35,11 @@ function normalizeEvent(ev) {
     match: `${home} vs ${away}`,
     home,
     away,
-    homeCode: home.slice(0, 3).toUpperCase(),
-    awayCode: away.slice(0, 3).toUpperCase(),
+    // Clubs are not FIFA codes — never invent ARS/WES from name slices.
+    homeCode: null,
+    awayCode: null,
+    homeBadge: ev.strHomeTeamBadge || null,
+    awayBadge: ev.strAwayTeamBadge || null,
     stage: ev.strLeague || "Soccer",
     date: ev.dateEvent || "TBD",
     score: played ? `${hs} - ${as}` : "Upcoming",
@@ -583,15 +586,22 @@ function paintFixtures(fixtures, mode) {
   fixtures.forEach((fixture) => {
     const card = document.createElement("div");
     card.className = "fixture-card";
+    // Prefer FIFA codes for WC board; full club names (+ badges) for live API.
     const homeKey = fixture.homeCode || fixture.home;
     const awayKey = fixture.awayCode || fixture.away;
     const homeLabel = fixture.home || homeKey;
     const awayLabel = fixture.away || awayKey;
     const homeRow = Flags
-      ? Flags.teamRowHtml(homeKey, homeLabel, fixture.homeFlags)
+      ? Flags.teamRowHtml(homeKey, homeLabel, fixture.homeFlags, {
+          badge: fixture.homeBadge,
+          league: fixture.stage
+        })
       : `<span>${homeLabel}</span>`;
     const awayRow = Flags
-      ? Flags.teamRowHtml(awayKey, awayLabel, fixture.awayFlags)
+      ? Flags.teamRowHtml(awayKey, awayLabel, fixture.awayFlags, {
+          badge: fixture.awayBadge,
+          league: fixture.stage
+        })
       : `<span>${awayLabel}</span>`;
     card.innerHTML = `
       <div class="fixture-main">

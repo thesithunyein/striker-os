@@ -1,6 +1,7 @@
 /**
- * Country flags — PNG from flagcdn.com (works in all major browsers; no emoji flags).
- * Maps FIFA codes, ISO2, and common team names → flag image URL.
+ * Country flags + club badges.
+ * - Nations: PNG from flagcdn.com (FIFA / ISO2 / common names)
+ * - Clubs (Live soccer API): TheSportsDB team badges, then nation flag fallback
  */
 (function () {
   const ISO_BY_FIFA = {
@@ -54,7 +55,6 @@
     VEN: "ve",
     HON: "hn",
     JAM: "jm",
-    CRC2: "cr",
     NZL: "nz",
     CHN: "cn",
     IDN: "id",
@@ -119,21 +119,63 @@
     Italy: "it",
     Turkey: "tr",
     "New Zealand": "nz",
-    // Common club names (live soccer API) → home nation
+    // Common clubs (live soccer API) → home nation
     Arsenal: "gb-eng",
     "West Ham United": "gb-eng",
+    "West Ham": "gb-eng",
     "Leeds United": "gb-eng",
+    Leeds: "gb-eng",
     "Coventry City": "gb-eng",
+    Coventry: "gb-eng",
     Liverpool: "gb-eng",
     Chelsea: "gb-eng",
     "Manchester United": "gb-eng",
     "Manchester City": "gb-eng",
+    "Man United": "gb-eng",
+    "Man City": "gb-eng",
     Tottenham: "gb-eng",
+    "Tottenham Hotspur": "gb-eng",
+    "Aston Villa": "gb-eng",
+    "Newcastle United": "gb-eng",
+    Brighton: "gb-eng",
+    "Brighton & Hove Albion": "gb-eng",
+    Fulham: "gb-eng",
+    Brentford: "gb-eng",
+    "Crystal Palace": "gb-eng",
+    Everton: "gb-eng",
+    "Wolverhampton Wanderers": "gb-eng",
+    Wolves: "gb-eng",
+    "Nottingham Forest": "gb-eng",
+    Bournemouth: "gb-eng",
+    "AFC Bournemouth": "gb-eng",
+    "Ipswich Town": "gb-eng",
+    "Leicester City": "gb-eng",
+    Southampton: "gb-eng",
     Barcelona: "es",
     "Real Madrid": "es",
+    "Atletico Madrid": "es",
     "Bayern Munich": "de",
+    "Borussia Dortmund": "de",
     "Paris Saint-Germain": "fr",
-    PSG: "fr"
+    PSG: "fr",
+    Juventus: "it",
+    Inter: "it",
+    "Inter Milan": "it",
+    Milan: "it",
+    "AC Milan": "it"
+  };
+
+  const ISO_BY_LEAGUE = {
+    "english premier league": "gb-eng",
+    "premier league": "gb-eng",
+    "la liga": "es",
+    "serie a": "it",
+    bundesliga: "de",
+    "ligue 1": "fr",
+    "eredivisie": "nl",
+    "primeira liga": "pt",
+    mls: "us",
+    "major league soccer": "us"
   };
 
   const PLACEHOLDER_SVG =
@@ -145,13 +187,33 @@
         "</svg>"
     );
 
-  function resolveIso2(team) {
-    if (!team || team === "TBD" || /winner|loser/i.test(team)) return null;
+  function resolveIso2(team, league) {
+    if (!team || team === "TBD" || /winner|loser/i.test(String(team))) return null;
     const t = String(team).trim();
-    if (ISO_BY_FIFA[t.toUpperCase()]) return ISO_BY_FIFA[t.toUpperCase()];
-    if (ISO_BY_NAME[t]) return ISO_BY_NAME[t];
     const upper = t.toUpperCase();
-    if (ISO_BY_FIFA[upper]) return ISO_BY_FIFA[upper];
+
+    // Real FIFA / ISO codes only (not ARS from "Arsenal")
+    if (/^[A-Z]{3}$/.test(upper) && ISO_BY_FIFA[upper]) return ISO_BY_FIFA[upper];
+    if (/^[a-z]{2}(-[a-z]{3})?$/i.test(t) && t.length <= 6) return t.toLowerCase();
+
+    if (ISO_BY_NAME[t]) return ISO_BY_NAME[t];
+
+    // Case-insensitive / partial club match
+    const lower = t.toLowerCase();
+    for (const name of Object.keys(ISO_BY_NAME)) {
+      if (name.toLowerCase() === lower) return ISO_BY_NAME[name];
+    }
+    for (const name of Object.keys(ISO_BY_NAME)) {
+      const n = name.toLowerCase();
+      if (lower.includes(n) || n.includes(lower)) return ISO_BY_NAME[name];
+    }
+
+    if (league) {
+      const L = String(league).toLowerCase();
+      for (const key of Object.keys(ISO_BY_LEAGUE)) {
+        if (L.includes(key)) return ISO_BY_LEAGUE[key];
+      }
+    }
     return null;
   }
 
@@ -174,6 +236,16 @@
       .replace(/"/g, "&quot;");
   }
 
+  function badgeImgHtml(badgeUrl, alt) {
+    if (!badgeUrl) return "";
+    const safe = escapeHtml(badgeUrl);
+    return (
+      `<img class="team-flag team-badge" src="${safe}"` +
+      ` width="28" height="28" alt="${escapeHtml(alt)} badge" loading="lazy" decoding="async"` +
+      ` onerror="this.onerror=null;this.classList.remove('team-badge');this.src='${PLACEHOLDER_SVG}'" />`
+    );
+  }
+
   function singleFlagImg(iso, alt) {
     if (!iso) {
       return `<span class="flag-fallback" title="${escapeHtml(alt)}">?</span>`;
@@ -188,8 +260,8 @@
     );
   }
 
-  function flagImgHtml(team, label) {
-    const iso = resolveIso2(team);
+  function flagImgHtml(team, label, league) {
+    const iso = resolveIso2(team, league);
     return singleFlagImg(iso, label || team || "Team");
   }
 
@@ -207,11 +279,27 @@
     );
   }
 
-  function teamRowHtml(codeOrName, displayName, extraFlags) {
+  /**
+   * @param {string} codeOrName
+   * @param {string} displayName
+   * @param {string[]} [extraFlags]
+   * @param {{ badge?: string, league?: string }} [opts]
+   */
+  function teamRowHtml(codeOrName, displayName, extraFlags, opts) {
+    opts = opts || {};
     const name = displayName || codeOrName || "TBD";
-    const flags = Array.isArray(extraFlags) && extraFlags.length
-      ? flagStackHtml(extraFlags, name)
-      : flagImgHtml(codeOrName, name);
+    let flags;
+    if (opts.badge) {
+      flags = badgeImgHtml(opts.badge, name);
+    } else if (Array.isArray(extraFlags) && extraFlags.length) {
+      flags = flagStackHtml(extraFlags, name);
+    } else {
+      // Try code, then display name, then league nation
+      const iso =
+        resolveIso2(codeOrName, opts.league) ||
+        resolveIso2(displayName, opts.league);
+      flags = singleFlagImg(iso, name);
+    }
     return `<div class="fixture-team">${flags}<span class="fixture-team-name">${escapeHtml(name)}</span></div>`;
   }
 

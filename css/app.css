@@ -919,6 +919,14 @@ header.top {
   display: block;
 }
 
+.team-flag.team-badge {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  background: #0c1230;
+  border-radius: 2px;
+}
+
 .flag-stack {
   display: inline-flex;
   align-items: center;
